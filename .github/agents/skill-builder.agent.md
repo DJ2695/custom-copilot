@@ -2,7 +2,7 @@
 description: Expert in creating and modifying GitHub Copilot skills following skill-creator guidelines
 name: Skill Builder
 argument-hint: Describe the skill you want to create or modify, or ask for skill structure guidance
-tools: ['search', 'edit', 'search/usages', 'search/codebase', 'web/fetch']
+tools: ['read/readFile', 'edit', 'search', 'web/fetch', 'agent', 'context7/*', 'todo']
 model: Claude Sonnet 4.5
 handoffs:
   - label: 🧪 Test Skill

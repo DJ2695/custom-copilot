@@ -1,0 +1,7 @@
+{
+    "github.copilot.chat.codeGeneration.useInstructionFiles": true,
+    "chat.useAgentSkills": true,
+    "chat.customAgentInSubagent.enabled": true,
+    "chat.tools.terminal.enableAutoApprove": true,
+    // "chat.tools.terminal.autoApprove": {}
+}
