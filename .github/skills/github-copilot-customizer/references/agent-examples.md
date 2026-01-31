@@ -7,7 +7,7 @@
 description: Generate implementation plans for new features or refactoring
 name: Planner
 tools: ['search', 'githubRepo', 'usages']
-model: Claude Sonnet 4
+model: Claude Sonnet 4.5
 handoffs:
   - label: Implement Plan
     agent: agent
@@ -66,7 +66,7 @@ Brief description of the feature or task.
 description: Review code for quality, security, and best practices
 name: Reviewer
 tools: ['search', 'usages']
-model: Claude Sonnet 4
+model: Claude Sonnet 4.5
 ---
 
 # Code Reviewer Instructions
@@ -116,7 +116,7 @@ Provide feedback in sections:
 description: Diagnose and fix bugs systematically
 name: Debugger
 tools: ['search', 'usages', 'fetch']
-model: Claude Sonnet 4
+model: Claude Sonnet 4.5
 handoffs:
   - label: Apply Fix
     agent: agent
@@ -169,7 +169,7 @@ Systematically diagnose issues and propose fixes.
 description: Generate and update documentation
 name: Documenter
 tools: ['search', 'usages']
-model: Claude Sonnet 4
+model: Claude Sonnet 4.5
 ---
 
 # Documentation Writer Instructions
@@ -219,7 +219,7 @@ Generate documentation in Markdown with:
 description: Generate comprehensive tests for code
 name: Tester
 tools: ['search', 'usages']
-model: GPT-4o
+model: Claude Opus 4.5
 ---
 
 # Test Generator Instructions

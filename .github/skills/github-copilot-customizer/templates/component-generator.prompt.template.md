@@ -1,6 +1,6 @@
 ---
 agent: 'agent'
-model: Claude Sonnet 4
+model: Claude Opus 4.5
 tools: ['githubRepo', 'search/codebase']
 description: '[Brief task description - shown in prompt picker UI]'
 ---

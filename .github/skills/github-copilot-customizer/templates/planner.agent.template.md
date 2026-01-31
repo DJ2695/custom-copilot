@@ -2,7 +2,7 @@
 description: [Brief description of what this agent does - shown in UI when selecting agents]
 name: [Display Name]
 tools: ['search', 'fetch', 'githubRepo', 'usages']
-model: Claude Sonnet 4
+model: Claude Sonnet 4.5
 handoffs:
   - label: [Button Label for Handoff]
     agent: [target-agent-name]

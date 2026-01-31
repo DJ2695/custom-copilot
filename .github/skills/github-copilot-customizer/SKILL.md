@@ -29,13 +29,19 @@ Guide for tailoring GitHub Copilot to your project's specific needs through five
 
 ## Customization Methods Overview
 
+**IMPORTANT**: File naming conventions are critical for proper detection by VS Code:
+- Agents MUST use `.agent.md` extension
+- Prompts MUST use `.prompt.md` extension  
+- Instructions MUST use `.instructions.md` extension
+- Skills MUST have `SKILL.md` file inside a named folder
+
 | Method | Location | Purpose | Scope |
 |--------|----------|---------|-------|
 | **Workspace Instructions** | `.github/copilot-instructions.md` | Baseline project-wide rules | All chat requests |
-| **Agents** | `.github/agents/*.md` | Specialized task workflows | On-demand via @agent |
-| **Prompts** | `.github/prompts/*.md` | Reusable task templates | On-demand invocation |
+| **Agents** | `.github/agents/*.agent.md` | Specialized task workflows | On-demand via @agent |
+| **Prompts** | `.github/prompts/*.prompt.md` | Reusable task templates | On-demand invocation |
 | **Instruction Files** | `.github/instructions/*.instructions.md` | Conditional file-type rules | Auto-applied by glob |
-| **Skills** | `.github/skills/*/SKILL.md` | Domain knowledge packages | Agent-loaded as needed |
+| **Skills** | `.github/skills/<skill-name>/SKILL.md` | Domain knowledge packages | Agent-loaded as needed |
 
 ## Recommended Directory Structure
 
@@ -43,18 +49,18 @@ Guide for tailoring GitHub Copilot to your project's specific needs through five
 .github/
 ├── copilot-instructions.md
 ├── agents/
-│   ├── planner.md
-│   ├── implementer.md
-│   └── reviewer.md
+│   ├── planner.agent.md
+│   ├── implementer.agent.md
+│   └── reviewer.agent.md
 ├── prompts/
-│   ├── generate-component.md
-│   └── security-review.md
+│   ├── generate-component.prompt.md
+│   └── security-review.prompt.md
 ├── instructions/
 │   ├── general-coding.instructions.md
 │   ├── python-coding.instructions.md
 │   └── typescript-coding.instructions.md
 ├── skills/
-│   └── [domain-skill]/SKILL.md
+│   └── <skill-name>/SKILL.md
 └── mcp.json
 ```
 
@@ -98,9 +104,11 @@ Baseline instructions applied to ALL chat requests in the workspace.
 
 ## 2. Custom Agents
 
-**Location**: `.github/agents/[agent-name].md`
+**Location**: `.github/agents/<agent-name>.agent.md`
 
-Specialized AI agents for specific development workflows with custom tools and handoffs.
+Specialized AI agents for specific development workflows with custom tools and handoffs. 
+
+**Critical**: Files MUST use the `.agent.md` extension (e.g., `planner.agent.md`, not `planner.md`).
 
 ### Template
 
@@ -109,7 +117,7 @@ Specialized AI agents for specific development workflows with custom tools and h
 description: [Brief purpose - shown in UI]
 name: [Display Name]
 tools: ['search', 'fetch', 'githubRepo', 'usages']
-model: Claude Sonnet 4.5.5
+model: Claude Sonnet 4.5
 handoffs:
   - label: [Button text]
     agent: [target-agent]
@@ -142,7 +150,7 @@ handoffs:
 
 ### Available Models
 
-- `Claude Sonnet 4.5.5` (recommended for planning and research)
+- `Claude Sonnet 4.5` (recommended for planning and research)
 - `Claude Opus 4.5` (recommended for implementation)
 - `Claude Haiku 4.5` (recommended for fast / easy tasks)
 - Default (omit `model` field)
@@ -191,9 +199,11 @@ Review code against project standards. Check for:
 
 ## 3. Prompt Files
 
-**Location**: `.github/prompts/[task-name].md`
+**Location**: `.github/prompts/<task-name>.prompt.md`
 
 Reusable, task-specific prompts invoked on-demand.
+
+**Critical**: Files MUST use the `.prompt.md` extension (e.g., `generate-component.prompt.md`, not `generate-component.md`).
 
 ### Template
 
@@ -269,9 +279,11 @@ Ask for component name and purpose if not provided.
 
 ## 4. Instruction Files
 
-**Location**: `.github/instructions/[topic].instructions.md`
+**Location**: `.github/instructions/<topic>.instructions.md`
 
 Conditional, file-type-specific guidelines auto-applied based on glob patterns.
+
+**Critical**: Files MUST use the `.instructions.md` extension (e.g., `python-coding.instructions.md`, not `python-coding.md`).
 
 ### Template
 
@@ -348,7 +360,7 @@ Apply [Python guidelines](./python-coding.instructions.md).
 
 ## 5. Skills
 
-**Location**: `.github/skills/[skill-name]/SKILL.md`
+**Location**: `.github/skills/<skill-name>/SKILL.md`
 
 Skills are modular knowledge packages for specialized domains. For detailed guidance on creating skills, use the **skill-creator** skill which provides comprehensive instructions on skill structure, bundled resources, and best practices.
 
@@ -449,10 +461,24 @@ Configure in `.vscode/settings.json`:
 | Issue | Solution |
 |-------|----------|
 | Instructions not applied | Verify `useInstructionFiles` is `true` in settings |
-| Agent not visible | Check YAML frontmatter syntax, ensure `.md` extension |
+| Agent not visible | Check YAML frontmatter syntax, ensure `.agent.md` extension |
+| Prompt not appearing | Ensure file uses `.prompt.md` extension |
+| Instruction file not applied | Verify `.instructions.md` extension and glob pattern |
 | Glob not matching | Test pattern, ensure correct syntax |
 | Tool reference fails | Verify tool in agent's `tools` list |
 | Conflicting rules | Order files general → specific, use explicit references |
+
+## Templates and Examples
+
+This skill includes bundled resources:
+- **templates/**: Ready-to-use templates for creating new files
+  - `planner.agent.template.md` - Planning agent template
+  - `component-generator.prompt.template.md` - Prompt file template
+  - `python-coding.instructions.template.md` - Instruction file template
+  - `copilot-instructions.template.md` - Workspace instructions template
+- **references/**: Complete working examples
+  - `agent-examples.md` - Common agent patterns (Planner, Reviewer, Debugger, Tester, Documenter)
+  - `instruction-examples.md` - Language/framework specific instruction files
 
 ## References
 
