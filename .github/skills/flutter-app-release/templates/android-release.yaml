@@ -1,0 +1,75 @@
+name: Android Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      track:
+        description: 'Release track'
+        required: true
+        type: choice
+        options:
+          - internal
+          - production
+
+jobs:
+  release-android:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x'
+          cache: true
+      
+      - name: Install dependencies
+        run: flutter pub get
+      
+      - name: Setup signing
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/app/release.keystore
+          echo "storeFile=release.keystore" > android/key.properties
+          echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" >> android/key.properties
+          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
+          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
+      
+      - name: Build Android
+        run: flutter build appbundle --release
+      
+      - name: Setup fastlane
+        run: |
+          cd android
+          bundle install
+      
+      - name: Create service account JSON
+        run: |
+          echo '${{ secrets.PLAY_STORE_CONFIG_JSON }}' > android/fastlane/service_account.json
+      
+      - name: Upload to Play Store
+        run: |
+          cd android
+          bundle exec fastlane ${{ inputs.track }}
+      
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -f android/app/release.keystore
+          rm -f android/key.properties
+          rm -f android/fastlane/service_account.json
+      
+      - name: Notify on success
+        if: success()
+        run: echo "✅ Android release to ${{ inputs.track }} successful"
+      
+      - name: Notify on failure
+        if: failure()
+        run: echo "❌ Android release failed"
