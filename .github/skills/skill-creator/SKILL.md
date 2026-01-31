@@ -36,6 +36,13 @@ The context window is a public good shared with system prompts, conversation his
 
 Prefer concise examples over verbose explanations.
 
+**Token budgets for frequently-used skills:**
+- **Very frequently loaded skills** (like common workflows): Target **<500 words** (~2-3 pages)
+- **Frequently loaded skills**: Target **<1000 words** (~4-5 pages)
+- **Specialized skills**: Can be longer but stay under 500 lines total
+
+If your skill exceeds these targets, use progressive disclosure with references/ and templates/ directories.
+
 ### 2. Set Appropriate Degrees of Freedom
 
 Match specificity to the task's fragility and variability:
@@ -53,6 +60,20 @@ Use a three-level loading system to manage context efficiently:
 3. **Bundled resources** - As needed by the agent (loaded on demand)
 
 Keep SKILL.md under 500 lines. Split content into separate reference files when approaching this limit.
+
+**When to move content out of SKILL.md:**
+- **API documentation** → `references/api.md`
+- **Comprehensive examples** → `references/examples.md`
+- **Schema definitions** → `references/schema.md`
+- **Starter code/boilerplate** → `templates/`
+- **Long reference tables** → `references/`
+
+**Keep in SKILL.md:**
+- Core principles and workflow
+- When to use / when NOT to use
+- Quick reference (single table/list)
+- One excellent minimal example
+- Links to detailed references
 
 ## Skill Anatomy
 
@@ -273,6 +294,9 @@ Ensure the skill meets all requirements:
 - [ ] `description` explains WHAT and WHEN
 - [ ] `description` is wrapped in single quotes
 - [ ] Body content is under 500 lines
+- [ ] **For frequently-used skills**: SKILL.md under 500 words (check with `wc -w`)
+- [ ] **For very common skills**: SKILL.md under 500 words with heavy content in references/
+- [ ] Long examples, API docs, or schemas moved to references/
 - [ ] No extraneous files (README.md, etc.)
 - [ ] Bundled assets are under 5MB each
 - [ ] Scripts are tested and working
@@ -315,6 +339,8 @@ my-awesome-skill/
 | Skill never triggers | Add common user phrases to description |
 | SKILL.md too long | Split detailed content into references/ files |
 | Context bloat | Move examples and API docs to references/ |
+| Frequently-used skill too long | Split into SKILL.md (<500 words) + references/, aim for minimal overview |
+| Word count too high | Use `wc -w SKILL.md` to check; move detailed content to references/ |
 
 ## Quick Reference: Frontmatter Template
 ```yaml
@@ -333,9 +359,10 @@ allowed-tools: bash python npm
 ## Key Takeaways
 
 1. **Description is critical** - It's the primary triggering mechanism
-2. **Keep SKILL.md concise** - Under 500 lines, split into references if needed
-3. **Progressive disclosure** - Load only what's needed when needed
-4. **Test bundled scripts** - Ensure they actually work before including
-5. **Avoid duplication** - Information lives in SKILL.md OR references, not both
-6. **No extraneous docs** - Only files needed for AI agent to do the job
-7. **Iterate based on usage** - Improve after real-world testing
+2. **Keep SKILL.md concise** - Under 500 lines; frequently-used skills under 500 words
+3. **Progressive disclosure** - Load only what's needed when needed; move API docs, examples, schemas to references/
+4. **Token efficiency matters** - Every word in a frequently-loaded skill costs tokens in every conversation
+5. **Test bundled scripts** - Ensure they actually work before including
+6. **Avoid duplication** - Information lives in SKILL.md OR references, not both
+7. **No extraneous docs** - Only files needed for AI agent to do the job
+8. **Iterate based on usage** - Improve after real-world testing
