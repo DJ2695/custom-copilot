@@ -109,7 +109,7 @@ Specialized AI agents for specific development workflows with custom tools and h
 description: [Brief purpose - shown in UI]
 name: [Display Name]
 tools: ['search', 'fetch', 'githubRepo', 'usages']
-model: Claude Sonnet 4
+model: Claude Sonnet 4.5.5
 handoffs:
   - label: [Button text]
     agent: [target-agent]
@@ -142,8 +142,9 @@ handoffs:
 
 ### Available Models
 
-- `Claude Sonnet 4` (recommended for planning)
-- `GPT-4o` (recommended for implementation)
+- `Claude Sonnet 4.5.5` (recommended for planning and research)
+- `Claude Opus 4.5` (recommended for implementation)
+- `Claude Haiku 4.5` (recommended for fast / easy tasks)
 - Default (omit `model` field)
 
 ### Common Agent Patterns
@@ -154,7 +155,7 @@ handoffs:
 description: Generate implementation plans for features
 name: Planner
 tools: ['search', 'githubRepo']
-model: Claude Sonnet 4
+model: Claude Sonnet 4.5
 handoffs:
   - label: Implement Plan
     agent: agent
@@ -176,7 +177,7 @@ You are in planning mode. Generate comprehensive plans without code edits.
 description: Review code for quality and best practices
 name: Reviewer
 tools: ['search', 'usages']
-model: Claude Sonnet 4
+model: Claude Sonnet 4.5
 ---
 
 Review code against project standards. Check for:
@@ -199,7 +200,7 @@ Reusable, task-specific prompts invoked on-demand.
 ```markdown
 ---
 agent: 'agent'
-model: Claude Sonnet 4
+model: Claude Sonnet 4.5
 tools: ['githubRepo', 'search/codebase']
 description: 'Brief description for UI'
 ---
