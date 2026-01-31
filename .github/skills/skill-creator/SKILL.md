@@ -347,12 +347,6 @@ my-awesome-skill/
 ---
 name: your-skill-name
 description: 'Brief capability summary. Use when [trigger 1], [trigger 2], or [specific scenario]. Supports [file types/frameworks].'
-license: MIT
-compatibility: Requires Python 3.8+, Node.js 16+
-metadata:
-  author: Your Name
-  version: 1.0.0
-allowed-tools: bash python npm
 ---
 ```
 
