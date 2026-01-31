@@ -1,0 +1,30 @@
+// Repository Interface Template (Domain Layer)
+// Location: features/${feature}/domain/repositories/${feature}_repository.dart
+// Replace: ${Feature} with PascalCase (e.g., FileUpload)
+// Replace: ${feature} with snake_case (e.g., file_upload)
+
+import 'package:fpdart/fpdart.dart';
+
+import '../entities/${feature}_entity.dart';
+import '../failures/${feature}_failure.dart';
+
+/// Repository interface for ${Feature} operations.
+/// 
+/// This is the domain layer contract - implementations live in data layer.
+/// Returns [TaskEither] for async operations with typed failures.
+abstract class ${Feature}Repository {
+  /// Get a single ${feature} by ID.
+  TaskEither<${Feature}Failure, ${Feature}Entity> get(String id);
+
+  /// Get all ${feature}s for the current user.
+  TaskEither<${Feature}Failure, List<${Feature}Entity>> getAll();
+
+  /// Create a new ${feature}.
+  TaskEither<${Feature}Failure, ${Feature}Entity> create(${Feature}Entity entity);
+
+  /// Update an existing ${feature}.
+  TaskEither<${Feature}Failure, Unit> update(${Feature}Entity entity);
+
+  /// Delete a ${feature} by ID.
+  TaskEither<${Feature}Failure, Unit> delete(String id);
+}

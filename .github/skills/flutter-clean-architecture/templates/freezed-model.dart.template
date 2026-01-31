@@ -1,0 +1,29 @@
+// Freezed model (DTO) template
+// Replace ${Model} with your model name (PascalCase)
+
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part '${model}_model.freezed.dart';
+part '${model}_model.g.dart';
+
+@freezed
+class ${Model}Model with _$${Model}Model {
+  const factory ${Model}Model({
+    required String id,
+    @JsonKey(name: 'created_at') required DateTime createdAt,
+    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    // Add your fields here
+  }) = _${Model}Model;
+
+  factory ${Model}Model.fromJson(Map<String, dynamic> json) =>
+      _$${Model}ModelFromJson(json);
+}
+
+// Optional: extension to convert to domain entity
+extension ${Model}ModelX on ${Model}Model {
+  ${Model}Entity toEntity() => ${Model}Entity(
+    id: id,
+    createdAt: createdAt,
+    updatedAt: updatedAt,
+  );
+}

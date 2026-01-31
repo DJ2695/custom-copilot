@@ -1,0 +1,121 @@
+// Remote DataSource Template (Data Layer)
+// Location: features/${feature}/data/datasources/${feature}_remote_datasource.dart
+// Replace: ${Feature} with PascalCase (e.g., FileUpload)
+// Replace: ${feature} with snake_case (e.g., file_upload)
+//
+// DataSources THROW exceptions - Repository catches and maps to Failures.
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import '../../domain/entities/${feature}_entity.dart';
+
+/// Remote data source for ${Feature} operations.
+/// 
+/// Handles Firestore communication. THROWS exceptions on errors.
+/// Repository layer catches exceptions and maps to domain failures.
+class ${Feature}RemoteDataSource {
+  final FirebaseFirestore _firestore;
+  
+  ${Feature}RemoteDataSource({
+    required FirebaseFirestore firestore,
+  }) : _firestore = firestore;
+
+  CollectionReference<Map<String, dynamic>> get _collection =>
+      _firestore.collection('${feature}s');
+
+  /// Fetches a single ${feature} by ID.
+  /// Throws [${Feature}NotFoundException] if not found.
+  Future<${Feature}Entity> fetch(String id) async {
+    final doc = await _collection.doc(id).get();
+    
+    if (!doc.exists) {
+      throw ${Feature}NotFoundException('${Feature} with id $id not found');
+    }
+    
+    return ${Feature}Entity.fromJson({
+      'id': doc.id,
+      ...doc.data()!,
+    });
+  }
+
+  /// Fetches all ${feature}s for the current user.
+  /// Assumes documents have 'userId' field for filtering.
+  Future<List<${Feature}Entity>> fetchAll({String? userId}) async {
+    Query<Map<String, dynamic>> query = _collection;
+    
+    if (userId != null) {
+      query = query.where('userId', isEqualTo: userId);
+    }
+    
+    final snapshot = await query.get();
+    
+    return snapshot.docs.map((doc) => ${Feature}Entity.fromJson({
+      'id': doc.id,
+      ...doc.data(),
+    })).toList();
+  }
+
+  /// Creates a new ${feature}.
+  /// Returns the created entity with generated ID.
+  Future<${Feature}Entity> create(${Feature}Entity entity) async {
+    final data = entity.toJson();
+    data.remove('id'); // Let Firestore generate ID
+    data['createdAt'] = FieldValue.serverTimestamp();
+    data['updatedAt'] = FieldValue.serverTimestamp();
+    
+    final docRef = await _collection.add(data);
+    
+    return entity.copyWith(id: docRef.id);
+  }
+
+  /// Updates an existing ${feature}.
+  /// Throws [${Feature}NotFoundException] if not found.
+  Future<void> update(${Feature}Entity entity) async {
+    final doc = _collection.doc(entity.id);
+    final exists = (await doc.get()).exists;
+    
+    if (!exists) {
+      throw ${Feature}NotFoundException('${Feature} with id ${entity.id} not found');
+    }
+    
+    final data = entity.toJson();
+    data.remove('id');
+    data.remove('createdAt'); // Don't update createdAt
+    data['updatedAt'] = FieldValue.serverTimestamp();
+    
+    await doc.update(data);
+  }
+
+  /// Deletes a ${feature} by ID.
+  /// Throws [${Feature}NotFoundException] if not found.
+  Future<void> delete(String id) async {
+    final doc = _collection.doc(id);
+    final exists = (await doc.get()).exists;
+    
+    if (!exists) {
+      throw ${Feature}NotFoundException('${Feature} with id $id not found');
+    }
+    
+    await doc.delete();
+  }
+}
+
+// ============================================================================
+// EXCEPTIONS (DataSource throws these, Repository catches)
+// ============================================================================
+
+class ${Feature}NotFoundException implements Exception {
+  final String message;
+  ${Feature}NotFoundException(this.message);
+  
+  @override
+  String toString() => message;
+}
+
+class ${Feature}PermissionException implements Exception {
+  final String message;
+  ${Feature}PermissionException(this.message);
+  
+  @override
+  String toString() => message;
+}

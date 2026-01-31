@@ -1,0 +1,51 @@
+// Domain Failure Template
+// Location: features/${feature}/domain/failures/${feature}_failure.dart
+// Replace: ${Feature} with PascalCase (e.g., FileUpload)
+// Replace: ${feature} with snake_case (e.g., file_upload)
+//
+// Domain-specific failures. Each feature should have its own failure hierarchy.
+
+/// Base class for ${Feature} failures.
+abstract class ${Feature}Failure {
+  const ${Feature}Failure(this.message);
+
+  final String message;
+
+  @override
+  String toString() => message;
+}
+
+/// ${Feature} was not found.
+class ${Feature}NotFoundFailure extends ${Feature}Failure {
+  const ${Feature}NotFoundFailure([super.message = '${Feature} not found']);
+}
+
+/// User doesn't have permission for this ${feature} operation.
+class ${Feature}PermissionFailure extends ${Feature}Failure {
+  const ${Feature}PermissionFailure([super.message = 'Permission denied']);
+}
+
+/// Failed to load ${feature} data.
+class ${Feature}LoadFailure extends ${Feature}Failure {
+  const ${Feature}LoadFailure([super.message = 'Failed to load ${feature}']);
+}
+
+/// Failed to save ${feature} data.
+class ${Feature}SaveFailure extends ${Feature}Failure {
+  const ${Feature}SaveFailure([super.message = 'Failed to save ${feature}']);
+}
+
+/// Failed to delete ${feature}.
+class ${Feature}DeleteFailure extends ${Feature}Failure {
+  const ${Feature}DeleteFailure([super.message = 'Failed to delete ${feature}']);
+}
+
+/// Validation failed for ${feature} data.
+class ${Feature}ValidationFailure extends ${Feature}Failure {
+  const ${Feature}ValidationFailure([super.message = 'Validation failed']);
+}
+
+/// Unknown/unexpected error.
+class ${Feature}UnknownFailure extends ${Feature}Failure {
+  const ${Feature}UnknownFailure([super.message = 'An unexpected error occurred']);
+}

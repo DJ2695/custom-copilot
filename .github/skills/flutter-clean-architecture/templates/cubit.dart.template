@@ -1,0 +1,61 @@
+// Cubit + Freezed State Template
+// Replace: ${Feature} with PascalCase (e.g., FileUpload)
+// Replace: ${feature} with snake_case (e.g., file_upload)
+
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+import '../../../domain/failures/${feature}_failure.dart';
+import '../../../domain/entities/${feature}_entity.dart';
+import '../../../domain/repositories/${feature}_repository.dart';
+
+part '${feature}_cubit.freezed.dart';
+
+// ============================================================================
+// STATE
+// ============================================================================
+
+@freezed
+class ${Feature}State with _$${Feature}State {
+  const factory ${Feature}State({
+    @Default(false) bool isLoading,
+    ${Feature}Entity? data,
+    ${Feature}Failure? failure,
+  }) = _${Feature}State;
+}
+
+extension ${Feature}StateX on ${Feature}State {
+  bool get hasError => failure != null;
+  bool get hasData => data != null;
+  bool get isEmpty => !isLoading && !hasError && !hasData;
+}
+
+// ============================================================================
+// CUBIT
+// ============================================================================
+
+class ${Feature}Cubit extends Cubit<${Feature}State> {
+  final ${Feature}Repository _repository;
+
+  ${Feature}Cubit(this._repository) : super(const ${Feature}State());
+
+  Future<void> load(String id) async {
+    emit(state.copyWith(isLoading: true, failure: null));
+
+    // IMPORTANT: Call .run() on TaskEither!
+    final result = await _repository.get(id).run();
+
+    result.fold(
+      (failure) => emit(state.copyWith(
+        isLoading: false,
+        failure: failure,
+      )),
+      (data) => emit(state.copyWith(
+        isLoading: false,
+        data: data,
+      )),
+    );
+  }
+
+  void reset() => emit(const ${Feature}State());
+}

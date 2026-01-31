@@ -1,0 +1,38 @@
+// Entity Template (Domain Layer)
+// Location: features/${feature}/domain/entities/${feature}_entity.dart
+// Replace: ${Feature} with PascalCase (e.g., FileUpload)
+// Replace: ${feature} with snake_case (e.g., file_upload)
+//
+// Entities are domain objects with JSON serialization.
+// No separate DTOs - entities handle both domain logic and serialization.
+
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part '${feature}_entity.freezed.dart';
+part '${feature}_entity.g.dart';
+
+@freezed
+class ${Feature}Entity with _$${Feature}Entity {
+  const ${Feature}Entity._(); // Private constructor for methods
+
+  const factory ${Feature}Entity({
+    required String id,
+    required String userId,
+    required String title,
+    String? description,
+    @JsonKey(name: 'createdAt') DateTime? createdAt,
+    @JsonKey(name: 'updatedAt') DateTime? updatedAt,
+  }) = _${Feature}Entity;
+
+  factory ${Feature}Entity.fromJson(Map<String, dynamic> json) =>
+      _$${Feature}EntityFromJson(json);
+
+  /// Check if entity has been persisted (has an ID).
+  bool get isPersisted => id.isNotEmpty;
+
+  /// Check if entity was recently updated.
+  bool get isRecentlyUpdated {
+    if (updatedAt == null) return false;
+    return DateTime.now().difference(updatedAt!).inHours < 24;
+  }
+}

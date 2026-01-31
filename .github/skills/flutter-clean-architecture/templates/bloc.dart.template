@@ -1,0 +1,125 @@
+// Bloc + Events + Freezed State Template
+// Replace: ${Feature} with PascalCase (e.g., FileUpload)
+// Replace: ${feature} with snake_case (e.g., file_upload)
+
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+import '../../../domain/failures/${feature}_failure.dart';
+import '../../../domain/entities/${feature}_entity.dart';
+import '../../../domain/repositories/${feature}_repository.dart';
+
+part '${feature}_bloc.freezed.dart';
+
+// ============================================================================
+// EVENTS
+// ============================================================================
+
+@freezed
+class ${Feature}Event with _$${Feature}Event {
+  const factory ${Feature}Event.load(String id) = _Load;
+  const factory ${Feature}Event.refresh() = _Refresh;
+  const factory ${Feature}Event.update(${Feature}Entity data) = _Update;
+  const factory ${Feature}Event.delete(String id) = _Delete;
+  const factory ${Feature}Event.reset() = _Reset;
+}
+
+// ============================================================================
+// STATE
+// ============================================================================
+
+@freezed
+class ${Feature}State with _$${Feature}State {
+  const factory ${Feature}State({
+    @Default(false) bool isLoading,
+    ${Feature}Entity? data,
+    ${Feature}Failure? failure,
+  }) = _${Feature}State;
+}
+
+extension ${Feature}StateX on ${Feature}State {
+  bool get hasError => failure != null;
+  bool get hasData => data != null;
+  bool get isEmpty => !isLoading && !hasError && !hasData;
+}
+
+// ============================================================================
+// BLOC
+// ============================================================================
+
+class ${Feature}Bloc extends Bloc<${Feature}Event, ${Feature}State> {
+  final ${Feature}Repository _repository;
+
+  ${Feature}Bloc(this._repository) : super(const ${Feature}State()) {
+    on<_Load>(_onLoad);
+    on<_Refresh>(_onRefresh);
+    on<_Update>(_onUpdate);
+    on<_Delete>(_onDelete);
+    on<_Reset>(_onReset);
+  }
+
+  Future<void> _onLoad(_Load event, Emitter<${Feature}State> emit) async {
+    emit(state.copyWith(isLoading: true, failure: null));
+
+    // IMPORTANT: Call .run() on TaskEither!
+    final result = await _repository.get(event.id).run();
+
+    result.fold(
+      (failure) => emit(state.copyWith(
+        isLoading: false,
+        failure: failure,
+      )),
+      (data) => emit(state.copyWith(
+        isLoading: false,
+        data: data,
+      )),
+    );
+  }
+
+  Future<void> _onRefresh(_Refresh event, Emitter<${Feature}State> emit) async {
+    if (state.data == null) return;
+    
+    // Refresh without showing loading indicator
+    final result = await _repository.get(state.data!.id).run();
+
+    result.fold(
+      (failure) => emit(state.copyWith(failure: failure)),
+      (data) => emit(state.copyWith(data: data, failure: null)),
+    );
+  }
+
+  Future<void> _onUpdate(_Update event, Emitter<${Feature}State> emit) async {
+    emit(state.copyWith(isLoading: true, failure: null));
+
+    final result = await _repository.update(event.data).run();
+
+    result.fold(
+      (failure) => emit(state.copyWith(
+        isLoading: false,
+        failure: failure,
+      )),
+      (_) => emit(state.copyWith(
+        isLoading: false,
+        data: event.data,
+      )),
+    );
+  }
+
+  Future<void> _onDelete(_Delete event, Emitter<${Feature}State> emit) async {
+    emit(state.copyWith(isLoading: true, failure: null));
+
+    final result = await _repository.delete(event.id).run();
+
+    result.fold(
+      (failure) => emit(state.copyWith(
+        isLoading: false,
+        failure: failure,
+      )),
+      (_) => emit(const ${Feature}State()), // Reset to initial
+    );
+  }
+
+  void _onReset(_Reset event, Emitter<${Feature}State> emit) {
+    emit(const ${Feature}State());
+  }
+}

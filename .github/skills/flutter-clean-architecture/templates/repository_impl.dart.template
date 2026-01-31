@@ -1,0 +1,89 @@
+// Repository Implementation Template (Data Layer)
+// Location: features/${feature}/data/repositories/${feature}_repository_firebase.dart
+// Replace: ${Feature} with PascalCase (e.g., FileUpload)
+// Replace: ${feature} with snake_case (e.g., file_upload)
+// 
+// Naming convention: Use descriptive names like:
+//   - ${Feature}RepositoryFirebase (for Firebase/Firestore impl)
+//   - ${Feature}RepositoryLocal (for local storage impl)
+//   - ${Feature}RepositoryMock (for testing)
+
+import 'package:fpdart/fpdart.dart';
+
+import '../../domain/entities/${feature}_entity.dart';
+import '../../domain/failures/${feature}_failure.dart';
+import '../../domain/repositories/${feature}_repository.dart';
+import '../datasources/${feature}_remote_datasource.dart';
+
+/// Firebase implementation of [${Feature}Repository].
+class ${Feature}RepositoryFirebase implements ${Feature}Repository {
+  final ${Feature}RemoteDataSource _remoteDataSource;
+
+  ${Feature}RepositoryFirebase({
+    required ${Feature}RemoteDataSource remoteDataSource,
+  }) : _remoteDataSource = remoteDataSource;
+
+  @override
+  TaskEither<${Feature}Failure, ${Feature}Entity> get(String id) {
+    return TaskEither.tryCatch(
+      () async {
+        return await _remoteDataSource.fetch(id);
+      },
+      (error, stackTrace) => _mapError(error),
+    );
+  }
+
+  @override
+  TaskEither<${Feature}Failure, List<${Feature}Entity>> getAll() {
+    return TaskEither.tryCatch(
+      () async {
+        return await _remoteDataSource.fetchAll();
+      },
+      (error, stackTrace) => _mapError(error),
+    );
+  }
+
+  @override
+  TaskEither<${Feature}Failure, ${Feature}Entity> create(${Feature}Entity entity) {
+    return TaskEither.tryCatch(
+      () async {
+        return await _remoteDataSource.create(entity);
+      },
+      (error, stackTrace) => _mapError(error),
+    );
+  }
+
+  @override
+  TaskEither<${Feature}Failure, Unit> update(${Feature}Entity entity) {
+    return TaskEither.tryCatch(
+      () async {
+        await _remoteDataSource.update(entity);
+        return unit;
+      },
+      (error, stackTrace) => _mapError(error),
+    );
+  }
+
+  @override
+  TaskEither<${Feature}Failure, Unit> delete(String id) {
+    return TaskEither.tryCatch(
+      () async {
+        await _remoteDataSource.delete(id);
+        return unit;
+      },
+      (error, stackTrace) => _mapError(error),
+    );
+  }
+
+  /// Maps exceptions to domain failures.
+  ${Feature}Failure _mapError(Object error) {
+    if (error is ${Feature}NotFoundException) {
+      return ${Feature}NotFoundFailure(error.message);
+    }
+    if (error is ${Feature}PermissionException) {
+      return ${Feature}PermissionFailure(error.message);
+    }
+    // Add more specific mappings as needed
+    return ${Feature}UnknownFailure(error.toString());
+  }
+}
