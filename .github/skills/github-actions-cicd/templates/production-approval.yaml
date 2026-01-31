@@ -1,0 +1,49 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: 
+      name: production
+      url: https://myapp.com
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install and Build
+        run: |
+          npm ci
+          npm run build
+      
+      - name: Deploy to production
+        run: |
+          # Add your deployment commands
+          echo "Deploying to production"
+        env:
+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+      
+      - name: Notify on success
+        if: success()
+        run: echo "Deployed successfully to production"
+      
+      - name: Notify on failure
+        if: failure()
+        run: echo "Deployment failed"
+
+# To enable manual approval:
+# 1. Go to Settings → Environments → production
+# 2. Add required reviewers
+# 3. Optionally set wait timer
