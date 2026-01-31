@@ -5,484 +5,120 @@ description: 'Comprehensive guide for customizing GitHub Copilot through workspa
 
 # GitHub Copilot Customizer
 
-Guide for tailoring GitHub Copilot to your project's specific needs through five customization methods: workspace instructions, custom agents, prompts, conditional instruction files, and skills.
+Tailor GitHub Copilot through six customization methods. This skill provides navigation to detailed guides.
 
 ## When to Use This Skill
 
-- Creating or updating `.github/copilot-instructions.md`
-- Building custom agents in `.github/agents/`
-- Creating reusable prompt files in `.github/prompts/`
-- Setting up file-type-specific instruction files in `.github/instructions/`
-- Organizing GitHub Copilot customization folder structure
-- Configuring MCP servers in `.github/mcp.json`
-- Understanding which customization method fits your use case
+Use this when you need to:
+- Create or modify `.github/copilot-instructions.md`
+- Build custom agents (`.agent.md`), prompts (`.prompt.md`), or instruction files (`.instructions.md`)
+- Configure MCP servers for external tool access
+- Choose the right customization method for your needs
+- Set up the `.github/` folder structure
+
+## Quick Decision Guide
+
+```
+Need to...
+├─ Apply rule to ALL code? → copilot-instructions.md
+├─ Apply rule to specific file types? → .instructions.md  
+├─ Create reusable workflow? → .agent.md
+├─ Template a common task? → .prompt.md
+├─ Package domain knowledge? → SKILL.md
+└─ Add external tools? → mcp.json (+ MCP server)
+```
+
+## Six Customization Methods
+
+| Method | Extension | When to Use | Details |
+|--------|-----------|-------------|---------|
+| **Workspace Instructions** | `.github/copilot-instructions.md` | Project-wide baseline rules | [Guide](references/detailed-guide.md#workspace-instructions) |
+| **Agents** | `.agent.md` | Task-specific workflows with tools | [Guide](references/detailed-guide.md#custom-agents) · [Examples](references/agent-examples.md) |
+| **Prompts** | `.prompt.md` | Reusable task templates | [Guide](references/detailed-guide.md#prompt-files) |
+| **Instructions** | `.instructions.md` | File-type conditional rules | [Guide](references/detailed-guide.md#instruction-files) · [Examples](references/instruction-examples.md) |
+| **Skills** | `SKILL.md` | Domain knowledge packages | [Guide](references/detailed-guide.md#agent-skills) |
+| **MCP Servers** | `.vscode/mcp.json` | External tool integration | [Setup Guide](references/mcp-setup.md) |
+
+**Critical**: Use exact file extensions or detection fails.
 
 ## Prerequisites
 
 - VS Code with GitHub Copilot extension
-- Enable instruction files in `.vscode/settings.json`:
-```json
-{
-  "github.copilot.chat.codeGeneration.useInstructionFiles": true
-}
-```
+- Enable instruction files in settings:
+  ```json
+  {
+    "github.copilot.chat.codeGeneration.useInstructionFiles": true,
+    "chat.agent.enabled": true
+  }
+  ```
 
-## Customization Methods Overview
-
-**IMPORTANT**: File naming conventions are critical for proper detection by VS Code:
-- Agents MUST use `.agent.md` extension
-- Prompts MUST use `.prompt.md` extension  
-- Instructions MUST use `.instructions.md` extension
-- Skills MUST have `SKILL.md` file inside a named folder
-
-| Method | Location | Purpose | Scope |
-|--------|----------|---------|-------|
-| **Workspace Instructions** | `.github/copilot-instructions.md` | Baseline project-wide rules | All chat requests |
-| **Agents** | `.github/agents/*.agent.md` | Specialized task workflows | On-demand via @agent |
-| **Prompts** | `.github/prompts/*.prompt.md` | Reusable task templates | On-demand invocation |
-| **Instruction Files** | `.github/instructions/*.instructions.md` | Conditional file-type rules | Auto-applied by glob |
-| **Skills** | `.github/skills/<skill-name>/SKILL.md` | Domain knowledge packages | Agent-loaded as needed |
-
-## Recommended Directory Structure
+## Directory Structure
 
 ```
 .github/
 ├── copilot-instructions.md
 ├── agents/
 │   ├── planner.agent.md
-│   ├── implementer.agent.md
 │   └── reviewer.agent.md
 ├── prompts/
-│   ├── generate-component.prompt.md
-│   └── security-review.prompt.md
+│   └── generate-component.prompt.md
 ├── instructions/
-│   ├── general-coding.instructions.md
 │   ├── python-coding.instructions.md
 │   └── typescript-coding.instructions.md
-├── skills/
-│   └── <skill-name>/SKILL.md
-└── mcp.json
+└── skills/
+    └── <skill-name>/SKILL.md
+
+.vscode/
+└── mcp.json  # VS Code only
 ```
 
----
-
-## 1. Workspace Instructions
-
-**File**: `.github/copilot-instructions.md`
-
-Baseline instructions applied to ALL chat requests in the workspace.
-
-### Template
-
-```markdown
-# Project Instructions
-
-## Project Overview
-- [Framework/stack description]
-- [Architectural patterns]
-
-## Coding Standards
-- [Naming conventions]
-- [Code organization rules]
-
-## Testing Requirements
-- [Test framework]
-- [Coverage expectations]
-
-## Documentation
-- [Doc style requirements]
-```
-
-### Best Practices
-
-- Keep concise and actionable
-- Focus on project-wide conventions only
-- Reference instruction files for detailed guidance
-- Avoid implementation-specific details
-
----
-
-## 2. Custom Agents
-
-**Location**: `.github/agents/<agent-name>.agent.md`
-
-Specialized AI agents for specific development workflows with custom tools and handoffs. 
-
-**Critical**: Files MUST use the `.agent.md` extension (e.g., `planner.agent.md`, not `planner.md`).
-
-### Template
-
-```markdown
----
-description: [Brief purpose - shown in UI]
-name: [Display Name]
-tools: ['search', 'fetch', 'githubRepo', 'usages']
-model: Claude Sonnet 4.5
-handoffs:
-  - label: [Button text]
-    agent: [target-agent]
-    prompt: [Optional handoff prompt]
-    send: false
----
-
-# [Agent Name] Instructions
-
-[Core behavior and purpose]
-
-## Task Guidelines
-- [Specific requirements]
-- [Output format]
-
-## Process
-1. [Step 1]
-2. [Step 2]
-```
-
-### Available Tools
-
-| Tool | Purpose |
-|------|---------|
-| `search` | Search codebase |
-| `fetch` | Fetch web content |
-| `githubRepo` | Access GitHub repository data |
-| `usages` | Find code usages |
-| `search/codebase` | Detailed codebase search |
-
-### Available Models
-
-- `Claude Sonnet 4.5` (recommended for planning and research)
-- `Claude Opus 4.5` (recommended for implementation)
-- `Claude Haiku 4.5` (recommended for fast / easy tasks)
-- Default (omit `model` field)
-
-### Common Agent Patterns
-
-**Planner Agent** - Generates implementation plans without code edits:
-```markdown
----
-description: Generate implementation plans for features
-name: Planner
-tools: ['search', 'githubRepo']
-model: Claude Sonnet 4.5
-handoffs:
-  - label: Implement Plan
-    agent: agent
-    send: false
----
-
-You are in planning mode. Generate comprehensive plans without code edits.
-
-## Plan Structure
-1. Overview
-2. Requirements
-3. Implementation steps
-4. Testing strategy
-```
-
-**Reviewer Agent** - Code review and quality checks:
-```markdown
----
-description: Review code for quality and best practices
-name: Reviewer
-tools: ['search', 'usages']
-model: Claude Sonnet 4.5
----
-
-Review code against project standards. Check for:
-- Code quality issues
-- Security concerns
-- Performance problems
-- Test coverage gaps
-```
-
----
-
-## 3. Prompt Files
-
-**Location**: `.github/prompts/<task-name>.prompt.md`
-
-Reusable, task-specific prompts invoked on-demand.
-
-**Critical**: Files MUST use the `.prompt.md` extension (e.g., `generate-component.prompt.md`, not `generate-component.md`).
-
-### Template
-
-```markdown
----
-agent: 'agent'
-model: Claude Sonnet 4.5
-tools: ['githubRepo', 'search/codebase']
-description: 'Brief description for UI'
----
-
-# [Task Name]
-
-[Task instructions]
-
-## Context
-Reference templates: #tool:githubRepo org/repo-templates
-Reference local: [design-system.md](../docs/design-system.md)
-
-## Requirements
-- [Requirement 1]
-- [Requirement 2]
-
-## Output Format
-- [Expected format]
-```
-
-### Agent Types
-
-| Type | Use For |
-|------|---------|
-| `agent` | Code generation tasks |
-| `ask` | Analysis, review, non-coding tasks |
-
-### Tool References
-
-```markdown
-# GitHub repository
-#tool:githubRepo contoso/templates
-
-# Local files (relative path)
-[design.md](../docs/design.md)
-
-# Tools
-#tool:search/codebase
-#tool:fetch
-```
-
-### Example: Component Generator
-
-```markdown
----
-agent: 'agent'
-tools: ['githubRepo', 'search/codebase']
-description: 'Generate React component from design system'
----
-
-# React Component Generator
-
-Generate component using #tool:githubRepo org/design-system.
-
-## Initial Questions
-Ask for component name and purpose if not provided.
-
-## Requirements
-- Use TypeScript with explicit prop types
-- Follow design system patterns
-- Include unit tests
-- Add Storybook story
-```
-
----
-
-## 4. Instruction Files
-
-**Location**: `.github/instructions/<topic>.instructions.md`
-
-Conditional, file-type-specific guidelines auto-applied based on glob patterns.
-
-**Critical**: Files MUST use the `.instructions.md` extension (e.g., `python-coding.instructions.md`, not `python-coding.md`).
-
-### Template
-
-```markdown
----
-applyTo: "**/*.py"
----
-
-# [Language/Topic] Guidelines
-
-[Guidelines that apply when glob matches]
-
-## Standards
-- [Standard 1]
-- [Standard 2]
-
-## Patterns
-- [Pattern 1]
-- [Pattern 2]
-```
-
-### Glob Pattern Examples
-
-| Pattern | Matches |
-|---------|---------|
-| `**` | All files |
-| `**/*.py` | All Python files |
-| `**/*.ts,**/*.tsx` | TypeScript and TSX |
-| `src/**/*.ts` | TypeScript in src folder |
-| `tests/**/*.test.ts` | Test files |
-| `docs/**/*.md` | Documentation files |
-
-### Layered Instructions Pattern
-
-Create a hierarchy from general to specific:
-
-**General** (`general-coding.instructions.md`):
-```markdown
----
-applyTo: "**"
----
-# General Coding Standards
-- Use meaningful names
-- Keep functions focused
-- Handle errors properly
-```
-
-**Language-specific** (`python-coding.instructions.md`):
-```markdown
----
-applyTo: "**/*.py"
----
-Apply [general guidelines](./general-coding.instructions.md).
-
-# Python Standards
-- Follow PEP 8
-- Use type hints
-- Write docstrings (Google format)
-```
-
-**Framework-specific** (`django-coding.instructions.md`):
-```markdown
----
-applyTo: "apps/**/*.py"
----
-Apply [Python guidelines](./python-coding.instructions.md).
-
-# Django Standards
-- Use class-based views
-- Follow fat models pattern
-```
-
----
-
-## 5. Skills
-
-**Location**: `.github/skills/<skill-name>/SKILL.md`
-
-Skills are modular knowledge packages for specialized domains. For detailed guidance on creating skills, use the **skill-creator** skill which provides comprehensive instructions on skill structure, bundled resources, and best practices.
-
-### Quick Overview
-
-Skills provide:
-- Domain expertise (schemas, business logic)
-- Specialized workflows
-- Bundled resources (scripts, references, templates)
-
-### Basic Structure
-
-```
-skill-name/
-├── SKILL.md              # Required
-├── references/           # Documentation
-├── scripts/              # Executable code
-├── assets/               # Static files
-└── templates/            # Code scaffolds
-```
-
-### Integration with Other Methods
-
-Reference skills from other customization files:
-- In agents: Point to skill documentation
-- In prompts: Create prompts that leverage skill knowledge
-- In instructions: Reference skill files for detailed guidance
-
----
-
-## MCP Server Configuration
-
-**File**: `.github/mcp.json`
-
-Extend Copilot with additional tools via Model Context Protocol.
-
-### Template
-
-```json
-{
-  "servers": {
-    "server-name": {
-      "command": "npx",
-      "args": ["-y", "@org/server-package"]
-    },
-    "http-server": {
-      "type": "http",
-      "url": "https://example.com/mcp"
-    }
-  },
-  "inputs": [
-    {
-      "type": "promptString",
-      "id": "api-key",
-      "description": "API Key",
-      "password": true
-    }
-  ]
-}
-```
-
----
-
-## VS Code Settings
-
-Configure in `.vscode/settings.json`:
-
-```json
-{
-  "github.copilot.chat.codeGeneration.useInstructionFiles": true,
-  
-  "github.copilot.chat.pullRequestDescriptionGeneration.instructions": [
-    { "text": "Include list of key changes." },
-    { "text": "Reference related issues." }
-  ],
-  
-  "github.copilot.chat.reviewSelection.instructions": [
-    { "file": ".github/instructions/code-review.instructions.md" }
-  ]
-}
-```
-
----
-
-## Decision Guide: Which Method to Use
-
-| Scenario | Method |
-|----------|--------|
-| Project-wide coding standards | `copilot-instructions.md` |
-| Multi-step workflow with handoffs | Custom Agent |
-| Reusable task template | Prompt File |
-| Rules for specific file types | Instruction File |
-| Deep domain knowledge | Skill |
-| External tool integration | MCP Server |
+## Quick Start
+
+1. **Create workspace baseline**: [Copy template](templates/copilot-instructions.template.md) to `.github/copilot-instructions.md`
+2. **Add custom agent**: [Use template](templates/agent.template.md) → save as `.github/agents/<name>.agent.md`
+3. **Create prompt**: [Use template](templates/prompt.template.md) → save as `.github/prompts/<name>.prompt.md`
+4. **Add instruction file**: [Use template](templates/instructions.template.md) → save as `.github/instructions/<name>.instructions.md`
+5. **Configure MCP**: See [MCP Setup Guide](references/mcp-setup.md)
+
+## Details and Examples
+
+### Complete Guides
+- [Detailed Guides](references/detailed-guide.md) - In-depth information on all methods
+  - Agent frontmatter properties (9 properties with handoffs)
+  - Available models and tools
+  - Prompt file properties
+  - Glob patterns for instruction files
+  - Skills vs Instructions comparison
+  - Combining methods patterns
+- [Agent Examples](references/agent-examples.md) - Common patterns (Planner, Implementer, Reviewer)
+- [Instruction Examples](references/instruction-examples.md) - Language/framework specific
+- [Chat Tools Reference](references/chat-tools.md) - Complete list of 47+ tools and tool sets
+- [VS Code Settings](references/recommended-settings.md) - Essential Copilot settings organized by category
+- [MCP Setup](references/mcp-setup.md) - Complete MCP server configuration guide with stdio/HTTP types
+
+### Templates
+- [Agent Template](templates/agent.template.md) - Generic `.agent.md` starter
+- [Prompt Template](templates/prompt.md) - Generic `.prompt.md` starter  
+- [Instructions Template](templates/instructions.template.md) - Generic `.instructions.md` starter
+- [Copilot Instructions Template](templates/copilot-instructions.template.md) - Workspace baseline starter
 
 ## Troubleshooting
 
 | Issue | Solution |
 |-------|----------|
-| Instructions not applied | Verify `useInstructionFiles` is `true` in settings |
-| Agent not visible | Check YAML frontmatter syntax, ensure `.agent.md` extension |
-| Prompt not appearing | Ensure file uses `.prompt.md` extension |
-| Instruction file not applied | Verify `.instructions.md` extension and glob pattern |
-| Glob not matching | Test pattern, ensure correct syntax |
-| Tool reference fails | Verify tool in agent's `tools` list |
-| Conflicting rules | Order files general → specific, use explicit references |
+| Instructions not applied | Enable `useInstructionFiles` in settings |
+| Agent not visible | Check `.agent.md` extension, verify YAML syntax |
+| Prompt not appearing | Ensure `.prompt.md` extension |
+| Instruction file ignored | Verify `.instructions.md` extension, test glob pattern |
+| MCP server not starting | Check command/args, view MCP output logs |
+| Tool not available | Verify tool in agent's `tools` list or MCP server running |
 
-## Templates and Examples
+## External Resources
 
-This skill includes bundled resources:
-- **templates/**: Ready-to-use templates for creating new files
-  - `planner.agent.template.md` - Planning agent template
-  - `component-generator.prompt.template.md` - Prompt file template
-  - `python-coding.instructions.template.md` - Instruction file template
-  - `copilot-instructions.template.md` - Workspace instructions template
-- **references/**: Complete working examples
-  - `agent-examples.md` - Common agent patterns (Planner, Reviewer, Debugger, Tester, Documenter)
-  - `instruction-examples.md` - Language/framework specific instruction files
-
-## References
-
-- [VS Code Copilot Customization](https://code.visualstudio.com/docs/copilot/customization/custom-instructions)
-- [Custom Agents](https://code.visualstudio.com/docs/copilot/customization/custom-agents)
+- [Custom Agents Documentation](https://code.visualstudio.com/docs/copilot/customization/custom-agents)
+- [Agent Skills Documentation](https://code.visualstudio.com/docs/copilot/customization/agent-skills)
+- [Custom Instructions](https://code.visualstudio.com/docs/copilot/customization/custom-instructions)
 - [Prompt Files](https://code.visualstudio.com/docs/copilot/customization/prompt-files)
+- [Chat Tools Reference](https://code.visualstudio.com/docs/copilot/reference/copilot-vscode-features#chat-tools)
 - [MCP Servers](https://code.visualstudio.com/docs/copilot/customization/mcp-servers)
+- [Agent Skills Standard](https://agentskills.io/)
