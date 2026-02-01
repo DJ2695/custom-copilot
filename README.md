@@ -2,17 +2,84 @@
 
 A language-agnostic CLI tool for managing GitHub Copilot customizations in any project. The `cc` tool helps you initialize, add, and sync GitHub Copilot artifacts including agents, prompts, instructions, skills, and MCP servers.
 
-## 🚀 Quick Start
+## 📋 Requirements
 
-### Installation
+- Python 3.12 or higher
+- pip (Python package installer)
+- Git (for installation from repository)
+
+## 🚀 Installation
+
+> **📖 For detailed installation instructions, troubleshooting, and platform-specific notes, see [INSTALL.md](INSTALL.md)**
+
+### Option 1: Install from GitHub (Public Repository)
+
+When the repository is public, you can install directly using pip:
 
 ```bash
-# Install from source
-pip install -e .
+# Install the latest version from the main branch
+pip install git+https://github.com/DJ2695/custom-copilot.git
 
-# The 'cc' command will now be available globally
-cc help
+# Install from a specific branch
+pip install git+https://github.com/DJ2695/custom-copilot.git@your-branch-name
+
+# Install from a specific tag/release
+pip install git+https://github.com/DJ2695/custom-copilot.git@v0.1.0
 ```
+
+### Option 2: Install from Private GitHub Repository
+
+If you have access to a private repository, use one of these methods:
+
+#### Using SSH (Recommended for private repos)
+
+```bash
+# First, ensure your SSH key is added to your GitHub account
+# Then install using SSH URL
+pip install git+ssh://git@github.com/DJ2695/custom-copilot.git
+```
+
+#### Using Personal Access Token (PAT)
+
+```bash
+# Create a Personal Access Token (PAT) at:
+# https://github.com/settings/tokens
+# With 'repo' scope for private repositories
+
+# Install using PAT (replace YOUR_TOKEN with your actual token)
+pip install git+https://YOUR_TOKEN@github.com/DJ2695/custom-copilot.git
+
+# Or set it as an environment variable for better security
+export GITHUB_TOKEN=your_token_here
+pip install git+https://${GITHUB_TOKEN}@github.com/DJ2695/custom-copilot.git
+```
+
+### Option 3: Install from Local Source (Development)
+
+For development or if you've cloned the repository:
+
+```bash
+# Clone the repository
+git clone https://github.com/DJ2695/custom-copilot.git
+cd custom-copilot
+
+# Install in editable mode (changes reflect immediately)
+pip install -e .
+```
+
+### Verify Installation
+
+After installation, verify the `cc` command is available:
+
+```bash
+# Check if cc is installed
+cc help
+
+# Check version
+cc --version  # (if version command is implemented)
+```
+
+## 🚀 Quick Start
 
 ### Initialize a Project
 
@@ -322,16 +389,40 @@ cc sync
 
 ## 📝 License
 
-This project is part of the DJ2695/custom-copilot repository.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+Copyright (c) 2026 DJ2695
 
 ## 🤝 Contributing
 
-Contributions are welcome! Feel free to:
-- Add new artifacts to the registry
-- Improve conflict resolution logic
-- Enhance CLI user experience
-- Add new commands
-- Improve documentation
+**Important:** This repository is currently maintained exclusively by [@DJ2695](https://github.com/DJ2695).
+
+At this time, **external contributions are not being accepted**. This includes:
+- Pull requests
+- Feature requests  
+- Bug reports
+
+For more details, please see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+### For Users
+
+If you'd like to customize this tool for your needs:
+- ✅ Fork this repository
+- ✅ Modify it according to the MIT License
+- ✅ Create your own version
+
+### For the Repository Owner
+
+Development workflow:
+```bash
+# Clone and install in editable mode
+git clone https://github.com/DJ2695/custom-copilot.git
+cd custom-copilot
+pip install -e .
+
+# Make changes and test
+cc help
+```
 
 ---
 

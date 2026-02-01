@@ -5,6 +5,26 @@ description = "Custom Copilot CLI - A tool for managing GitHub Copilot artifacts
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = []
+authors = [
+    {name = "DJ2695", email = "35080988+DJ2695@users.noreply.github.com"}
+]
+license = {text = "MIT"}
+keywords = ["github", "copilot", "cli", "mcp", "agents", "prompts"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Utilities",
+]
+
+[project.urls]
+Homepage = "https://github.com/DJ2695/custom-copilot"
+Repository = "https://github.com/DJ2695/custom-copilot"
+Issues = "https://github.com/DJ2695/custom-copilot/issues"
 
 [project.scripts]
 cc = "cc.cli:main"
