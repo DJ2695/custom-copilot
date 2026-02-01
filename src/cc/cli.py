@@ -6,7 +6,7 @@ This module provides the main CLI entry point and command routing.
 
 import sys
 from typing import List, Optional
-from cc.commands import init, add, sync, list as list_cmd
+from cc.commands import init, add, sync, list as list_cmd, bundle
 
 
 def print_help():
@@ -21,6 +21,8 @@ Usage:
     cuco add instructions <name>               Add instructions from registry
     cuco add skill <name>                      Add a skill from registry
     cuco add mcp <name>                        Add an MCP server from registry
+    cuco bundle list                           List available bundles
+    cuco bundle add <name>                     Install a bundle
     cuco list <type>                           List available artifacts in registry
     cuco sync                                  Sync all artifacts from registry
     cuco sync <artifact-name>                  Sync specific artifact from registry
@@ -31,6 +33,8 @@ Examples:
     cuco add agent skill-builder
     cuco add skill test-driven-development
     cuco add mcp context7
+    cuco bundle list
+    cuco bundle add example-bundle
     cuco list skills
     cuco list mcps
     cuco sync
@@ -69,6 +73,8 @@ def main(args: Optional[List[str]] = None) -> int:
             return sync.run(args[1:])
         elif command == "list":
             return list_cmd.run(args[1:])
+        elif command == "bundle":
+            return bundle.run(args[1:])
         else:
             print(f"Error: Unknown command '{command}'")
             print("Run 'cuco help' for usage information.")
