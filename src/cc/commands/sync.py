@@ -1,7 +1,7 @@
 """
 Sync command - Sync artifacts with the registry.
 
-This module implements the `cc sync` command which checks for updates
+This module implements the `cuco sync` command which checks for updates
 to artifacts from the registry and handles conflicts with local modifications.
 """
 
@@ -189,7 +189,7 @@ def run(args: List[str]) -> int:
     # Check if .github directory exists
     if not get_github_dir().exists():
         print("Error: .github directory not found")
-        print("Run 'cc init' first to initialize the structure")
+        print("Run 'cuco init' first to initialize the structure")
         return 1
     
     # Sync specific artifact
@@ -202,7 +202,7 @@ def run(args: List[str]) -> int:
         
         if not matching:
             print(f"Error: Artifact '{artifact_name}' is not tracked")
-            print("Only artifacts added via 'cc add' can be synced")
+            print("Only artifacts added via 'cuco add' can be synced")
             return 1
         
         artifact = matching[0]
@@ -216,7 +216,7 @@ def run(args: List[str]) -> int:
     
     if not tracked_artifacts:
         print("No tracked artifacts found.")
-        print("Add artifacts using 'cc add' command first.")
+        print("Add artifacts using 'cuco add' command first.")
         return 0
     
     print(f"Checking {len(tracked_artifacts)} tracked artifact(s)...\n")

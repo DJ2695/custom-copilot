@@ -1,7 +1,7 @@
 """
 MCP command - Add MCP servers from registry.
 
-This module implements the `cc add mcp` command which copies MCP server
+This module implements the `cuco add mcp` command which copies MCP server
 configurations from the registry and handles environment variable setup.
 """
 
@@ -241,7 +241,7 @@ def run(args: List[str]) -> int:
     """
     if len(args) < 1:
         print("Error: Missing MCP name")
-        print("Usage: cc add mcp <name>")
+        print("Usage: cuco add mcp <name>")
         print("\nAvailable MCP servers:")
         registry = load_mcp_registry()
         for name in sorted(registry.get("servers", {}).keys()):

@@ -13,7 +13,7 @@ from typing import Dict, Optional, List
 
 
 # Tracking file to store metadata about artifacts
-TRACKING_FILE = ".cc-tracking.json"
+TRACKING_FILE = ".cuco-tracking.json"
 
 
 def get_project_root() -> Path:

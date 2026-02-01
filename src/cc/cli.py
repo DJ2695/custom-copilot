@@ -12,29 +12,29 @@ from cc.commands import init, add, sync, list as list_cmd
 def print_help():
     """Print CLI help message."""
     help_text = """
-Custom Copilot CLI (cc) - Manage GitHub Copilot artifacts
+Custom Copilot CLI (cuco) - Manage GitHub Copilot artifacts
 
 Usage:
-    cc init                                  Initialize .github folder structure
-    cc add agent <name>                      Add an agent from registry
-    cc add prompt <name>                     Add a prompt from registry
-    cc add instructions <name>               Add instructions from registry
-    cc add skill <name>                      Add a skill from registry
-    cc add mcp <name>                        Add an MCP server from registry
-    cc list <type>                           List available artifacts in registry
-    cc sync                                  Sync all artifacts from registry
-    cc sync <artifact-name>                  Sync specific artifact from registry
-    cc help                                  Show this help message
+    cuco init                                  Initialize .github folder structure
+    cuco add agent <name>                      Add an agent from registry
+    cuco add prompt <name>                     Add a prompt from registry
+    cuco add instructions <name>               Add instructions from registry
+    cuco add skill <name>                      Add a skill from registry
+    cuco add mcp <name>                        Add an MCP server from registry
+    cuco list <type>                           List available artifacts in registry
+    cuco sync                                  Sync all artifacts from registry
+    cuco sync <artifact-name>                  Sync specific artifact from registry
+    cuco help                                  Show this help message
 
 Examples:
-    cc init
-    cc add agent skill-builder
-    cc add skill test-driven-development
-    cc add mcp context7
-    cc list skills
-    cc list mcps
-    cc sync
-    cc sync skill-builder
+    cuco init
+    cuco add agent skill-builder
+    cuco add skill test-driven-development
+    cuco add mcp context7
+    cuco list skills
+    cuco list mcps
+    cuco sync
+    cuco sync skill-builder
 
 For more information, visit: https://github.com/DJ2695/custom-copilot
 """
@@ -71,7 +71,7 @@ def main(args: Optional[List[str]] = None) -> int:
             return list_cmd.run(args[1:])
         else:
             print(f"Error: Unknown command '{command}'")
-            print("Run 'cc help' for usage information.")
+            print("Run 'cuco help' for usage information.")
             return 1
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)

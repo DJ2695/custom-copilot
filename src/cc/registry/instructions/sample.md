@@ -6,7 +6,7 @@ This is a sample instructions file that can be added to your project.
 
 Add this file using:
 ```
-cc add instructions sample
+cuco add instructions sample
 ```
 
 ## Content

@@ -1,6 +1,6 @@
-# Custom Copilot CLI (`cc`)
+# Custom Copilot CLI (`cuco`)
 
-A language-agnostic CLI tool for managing GitHub Copilot customizations in any project. The `cc` tool helps you initialize, add, and sync GitHub Copilot artifacts including agents, prompts, instructions, skills, and MCP servers.
+A language-agnostic CLI tool for managing GitHub Copilot customizations in any project. The `cuco` tool helps you initialize, add, and sync GitHub Copilot artifacts including agents, prompts, instructions, skills, and MCP servers.
 
 ## 📋 Requirements
 
@@ -129,11 +129,11 @@ uv pip install -e ".[dev]"
 
 ### Verify Installation
 
-After installation, verify the `cc` command is available:
+After installation, verify the `cuco` command is available:
 
 ```bash
-# Check if cc is installed
-cc help
+# Check if cuco is installed
+cuco help
 
 # If installed with uv tool, it's automatically in PATH
 # If using project install, activate your environment first
@@ -146,7 +146,7 @@ cc help
 ```bash
 # Create .github folder structure
 cd your-project
-cc init
+cuco init
 ```
 
 This creates:
@@ -164,29 +164,29 @@ your-project/
 
 ```bash
 # List available artifacts in the registry
-cc list skills
-cc list prompts
-cc list agents
-cc list mcps
+cuco list skills
+cuco list prompts
+cuco list agents
+cuco list mcps
 ```
 
 ### Add Artifacts
 
 ```bash
 # Add an agent
-cc add agent skill-builder
+cuco add agent skill-builder
 
 # Add a prompt
-cc add prompt git
+cuco add prompt git
 
 # Add instructions
-cc add instructions sample
+cuco add instructions sample
 
 # Add a skill
-cc add skill test-driven-development
+cuco add skill test-driven-development
 
 # Add an MCP server (automatically handles .env setup)
-cc add mcp context7
+cuco add mcp context7
 ```
 
 ### Sync Artifacts
@@ -195,25 +195,25 @@ Keep your artifacts up to date with the registry:
 
 ```bash
 # Sync all tracked artifacts
-cc sync
+cuco sync
 
 # Sync a specific artifact
-cc sync test-driven-development
+cuco sync test-driven-development
 ```
 
-If you've made local modifications, `cc sync` will prompt you to:
+If you've made local modifications, `cuco sync` will prompt you to:
 - Overwrite with the registry version
 - Keep your local changes
 
 ## 📖 Commands
 
-### `cc init`
+### `cuco init`
 
 Initialize the `.github` folder structure in your project.
 
 **Usage:**
 ```bash
-cc init
+cuco init
 ```
 
 **What it does:**
@@ -221,30 +221,30 @@ cc init
 - Creates subdirectories: `agents/`, `prompts/`, `instructions/`, `skills/`
 - Creates empty `copilot-instructions.md` file
 
-### `cc add <type> <name>`
+### `cuco add <type> <name>`
 
 Add an artifact from the package registry to your project.
 
 **Usage:**
 ```bash
-cc add agent <name>
-cc add prompt <name>
-cc add instructions <name>
-cc add skill <name>
-cc add mcp <name>
+cuco add agent <name>
+cuco add prompt <name>
+cuco add instructions <name>
+cuco add skill <name>
+cuco add mcp <name>
 ```
 
 **Examples:**
 ```bash
-cc add agent skill-builder
-cc add prompt git
-cc add skill test-driven-development
-cc add mcp context7
+cuco add agent skill-builder
+cuco add prompt git
+cuco add skill test-driven-development
+cuco add mcp context7
 ```
 
 **What it does:**
 - Copies the artifact from the package registry to `.github/<type>/`
-- Tracks the artifact in `.github/.cc-tracking.json`
+- Tracks the artifact in `.github/.cuco-tracking.json`
 - Prompts for confirmation if artifact already exists
 - **For MCPs**: 
   - Adds MCP server configuration to `.vscode/mcp.json`
@@ -252,22 +252,22 @@ cc add mcp context7
   - Creates/updates `.env` file with required variables
   - Prompts you to set the values
 
-### `cc list <type>`
+### `cuco list <type>`
 
 List available artifacts in the package registry.
 
 **Usage:**
 ```bash
-cc list agents
-cc list prompts
-cc list instructions
-cc list skills
-cc list mcps
+cuco list agents
+cuco list prompts
+cuco list instructions
+cuco list skills
+cuco list mcps
 ```
 
 **Examples:**
 ```bash
-cc list skills
+cuco list skills
 # Output:
 # Available skills:
 #   - skill-creator
@@ -275,7 +275,7 @@ cc list skills
 #   - test-driven-development
 #   ...
 
-cc list mcps
+cuco list mcps
 # Output:
 # Available mcps:
 #   - context7
@@ -288,23 +288,23 @@ cc list mcps
 - Shows all available artifacts of the specified type from the registry
 - Helps you discover what's available before adding
 
-### `cc sync [artifact-name]`
+### `cuco sync [artifact-name]`
 
 Sync artifacts with the package registry.
 
 **Usage:**
 ```bash
 # Sync all tracked artifacts
-cc sync
+cuco sync
 
 # Sync specific artifact
-cc sync <artifact-name>
+cuco sync <artifact-name>
 ```
 
 **Examples:**
 ```bash
-cc sync                          # Sync everything
-cc sync test-driven-development  # Sync specific skill
+cuco sync                          # Sync everything
+cuco sync test-driven-development  # Sync specific skill
 ```
 
 **What it does:**
@@ -327,9 +327,9 @@ src/cc/
 ├── utils.py              # Utilities (hashing, tracking)
 ├── commands/             # Command implementations
 │   ├── __init__.py
-│   ├── init.py          # cc init command
-│   ├── add.py           # cc add command
-│   └── sync.py          # cc sync command
+│   ├── init.py          # cuco init command
+│   ├── add.py           # cuco add command
+│   └── sync.py          # cuco sync command
 └── registry/             # Bundled artifacts
     ├── agents/
     ├── prompts/
@@ -339,7 +339,7 @@ src/cc/
 
 ### Tracking System
 
-The tool tracks artifacts in `.github/.cc-tracking.json`:
+The tool tracks artifacts in `.github/.cuco-tracking.json`:
 
 ```json
 {
@@ -364,7 +364,7 @@ This enables:
 ### How It Works
 
 1. **Registry**: Artifacts are bundled with the package in `src/cc/registry/`
-2. **Tracking**: When you `cc add` an artifact, its hash is stored
+2. **Tracking**: When you `cuco add` an artifact, its hash is stored
 3. **Sync Detection**:
    - Compare current file hash with tracked hash → detects local changes
    - Compare tracked hash with registry hash → detects upstream updates
@@ -431,9 +431,9 @@ pip install -e .
 
 # Test commands
 cd /tmp/test-project
-cc init
-cc add skill test-driven-development
-cc sync
+cuco init
+cuco add skill test-driven-development
+cuco sync
 ```
 
 ## 🔮 Future Enhancements
@@ -481,7 +481,7 @@ cd custom-copilot
 pip install -e .
 
 # Make changes and test
-cc help
+cuco help
 ```
 
 ---
