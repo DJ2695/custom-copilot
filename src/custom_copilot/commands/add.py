@@ -308,7 +308,10 @@ def run(args: List[str]) -> int:
     
     # Check if artifact_name is a GitHub URL
     if artifact_name.startswith("http://") or artifact_name.startswith("https://"):
-        if "github.com" in artifact_name or "githubusercontent.com" in artifact_name:
+        # Validate it's actually a GitHub URL by checking the domain properly
+        if artifact_name.startswith("https://github.com/") or \
+           artifact_name.startswith("http://github.com/") or \
+           artifact_name.startswith("https://raw.githubusercontent.com/"):
             print(f"Detected GitHub URL, fetching {artifact_type_singular}...")
             if add_from_github_url(artifact_name, artifact_type):
                 return 0
@@ -316,6 +319,9 @@ def run(args: List[str]) -> int:
                 return 1
         else:
             print("Error: Only GitHub URLs are currently supported")
+            print("  Supported formats:")
+            print("    - https://github.com/owner/repo/...")
+            print("    - https://raw.githubusercontent.com/owner/repo/...")
             return 1
     
     # Copy the artifact from registry

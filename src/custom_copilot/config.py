@@ -316,9 +316,10 @@ def parse_github_url(url: str) -> Optional[Dict[str, str]]:
     url = url.strip()
     
     # Handle raw.githubusercontent.com URLs
-    if "raw.githubusercontent.com" in url:
+    if url.startswith("https://raw.githubusercontent.com/"):
         # Format: https://raw.githubusercontent.com/owner/repo/branch/path
-        parts = url.replace("https://raw.githubusercontent.com/", "").split("/")
+        url_path = url[len("https://raw.githubusercontent.com/"):]
+        parts = url_path.split("/")
         if len(parts) >= 3:
             return {
                 "owner": parts[0],
@@ -328,10 +329,10 @@ def parse_github_url(url: str) -> Optional[Dict[str, str]]:
             }
     
     # Handle regular github.com URLs
-    if "github.com" in url:
+    if url.startswith("https://github.com/") or url.startswith("http://github.com/"):
         # Remove protocol and domain
-        url = url.replace("https://github.com/", "").replace("http://github.com/", "")
-        parts = url.split("/")
+        url_path = url.replace("https://github.com/", "").replace("http://github.com/", "")
+        parts = url_path.split("/")
         
         if len(parts) >= 2:
             result = {
