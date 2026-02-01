@@ -14,6 +14,13 @@
         "type": "custom-copilot",
         "source": "agents/agent-name.agent.md",
         "description": "Description of why this agent is included"
+      },
+      {
+        "name": "custom-agent",
+        "type": "custom",
+        "source_name": "my-company",
+        "source": "agents/custom-agent.agent.md",
+        "description": "Agent from a custom git source"
       }
     ],
     "prompts": [

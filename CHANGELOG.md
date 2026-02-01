@@ -1,5 +1,61 @@
 # Changelog
 
+## [0.3.0] - 2026-02-01
+
+### Major Update - Git Repository Cloning and Custom Resource Type
+
+#### Added
+
+- **Git repository cloning support**
+  - Automatic cloning of private git repositories to `~/.cuco/repos/`
+  - Automatic updates on subsequent access
+  - Support for HTTPS and SSH authentication
+  - Clear error messages for authentication issues
+  
+- **"custom" resource type**
+  - Reference resources from configured git sources
+  - Requires `source_name` and `source` fields
+  - Automatically clones/updates repository when needed
+  - Looks for `custom_copilot/` folder in cloned repos
+  
+- **Improved source management**
+  - Simplified syntax: `cuco source add <name> <url>` (no type needed)
+  - Automatically sets type to "git"
+  - Better examples and help messages
+  - Helpful output showing how to use custom resources
+
+#### Changed
+
+- **Source command syntax simplified**
+  - Old: `cuco source add <name> <type> <url>`
+  - New: `cuco source add <name> <url>`
+  - Type is automatically set to "git"
+  
+- **CLI help updated**
+  - Added resource types documentation
+  - Clearer examples for HTTPS and SSH
+  - Better organization
+
+#### Example Usage
+
+```bash
+# Add a git source
+cuco source add my-company https://github.com/mycompany/copilot-customs.git
+
+# Use in bundle.json
+{
+  "dependencies": {
+    "agents": [{
+      "type": "custom",
+      "source_name": "my-company",
+      "source": "agents/my-agent.agent.md"
+    }]
+  }
+}
+```
+
+---
+
 ## [0.2.0] - 2026-02-01
 
 ### Major Refactoring - Professional Package with Private Repo Support

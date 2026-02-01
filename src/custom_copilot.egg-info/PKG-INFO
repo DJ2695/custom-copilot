@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: custom-copilot
-Version: 0.2.0
+Version: 0.3.0
 Summary: Professional CLI tool for managing GitHub Copilot customizations
 Author-email: DJ2695 <35080988+DJ2695@users.noreply.github.com>
 License: MIT
@@ -148,6 +148,7 @@ Bundles are pre-configured combinations of customizations. The manifest uses the
 
 - **`custom-copilot`** - Resources from the public custom-copilot repository
 - **`bundle`** - Resources included within the bundle
+- **`custom`** - Resources from configured git sources (private repositories)
 - **`github`** - Resources from 3rd party GitHub repositories (future)
 
 ### Example Bundle Manifest
@@ -162,6 +163,12 @@ Bundles are pre-configured combinations of customizations. The manifest uses the
         "name": "skill-builder",
         "type": "custom-copilot",
         "source": "agents/skill-builder.agent.md"
+      },
+      {
+        "name": "company-agent",
+        "type": "custom",
+        "source_name": "my-company",
+        "source": "agents/company-agent.agent.md"
       }
     ],
     "prompts": [
@@ -180,26 +187,73 @@ Bundles are pre-configured combinations of customizations. The manifest uses the
 Add your company's private customizations repository:
 
 ```bash
-# Add a private source
-cuco source add company git https://github.com/mycompany/copilot-customs.git
+# Add a private source with HTTPS (uses git credentials)
+cuco source add my-company https://github.com/mycompany/copilot-customs.git
 
-# Configuration is stored in ~/.cuco/config.json
-# Or use .cuco-config.json in your project for project-specific sources
+# Or add with SSH (requires SSH key setup)
+cuco source add my-company git@github.com:mycompany/copilot-customs.git
+
+# List configured sources
+cuco source list
+```
+
+The private repository must have the same structure as the public repo:
+
+```
+mycompany/copilot-customs/
+└── custom_copilot/
+    ├── agents/
+    ├── prompts/
+    ├── skills/
+    └── bundles/
 ```
 
 ### Configuration File
+
+Configuration is stored in:
+- `~/.cuco/config.json` (global)
+- `.cuco-config.json` (project-specific, takes precedence)
 
 ```json
 {
   "sources": [
     {
-      "name": "company-internal",
+      "name": "my-company",
       "type": "git",
       "url": "https://github.com/mycompany/copilot-customs.git"
     }
   ]
 }
 ```
+
+### Using Custom Resources in Bundles
+
+```json
+{
+  "dependencies": {
+    "agents": [
+      {
+        "name": "company-agent",
+        "type": "custom",
+        "source_name": "my-company",
+        "source": "agents/company-agent.agent.md"
+      }
+    ]
+  }
+}
+```
+
+### Authentication
+
+**HTTPS URLs:**
+- Uses git credential helper
+- May prompt for username and password/token
+- Set up a personal access token for private repos
+
+**SSH URLs:**
+- Requires SSH keys set up with ssh-agent
+- Run `ssh-add ~/.ssh/id_rsa` to add your key
+- No password prompts during clone/pull
 
 ## Creating Custom Resources
 
