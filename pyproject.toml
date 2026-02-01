@@ -1,9 +1,21 @@
 [project]
 name = "copilot"
 version = "0.1.0"
-description = "Add your description here"
+description = "Custom Copilot CLI - A tool for managing GitHub Copilot artifacts"
 readme = "README.md"
-requires-python = ">=3.13"
-dependencies = [
-    "skilz>=1.10.0",
-]
+requires-python = ">=3.12"
+dependencies = []
+
+[project.scripts]
+cc = "cc.cli:main"
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["cc", "cc.commands"]
+package-dir = {"" = "src"}
+
+[tool.setuptools.package-data]
+cc = ["registry/**/*"]
