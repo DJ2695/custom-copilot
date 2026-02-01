@@ -1,14 +1,65 @@
-# Migration Guide: Simplified Structure with custom_copilot
+# Migration Guide: Professional Package with Private Repo Support
 
-This guide explains the new simplified structure inspired by https://github.com/anthropics/skills.
+This guide explains the latest improvements to custom-copilot.
 
-## What Changed?
+## Latest Changes (v0.2.0)
+
+### Package Renamed
+
+- **Old:** Package name was "copilot", module was "cc"
+- **New:** Package name is "custom-copilot", module is "custom_copilot"
+
+### Bundle Resource Types Updated
+
+Resource types in bundle manifests have been renamed for clarity:
+
+- **`custom-copilot`** (was "reference") - Resources from the custom-copilot repository
+- **`bundle`** (was "inline") - Resources included within the bundle
+- **`github`** (new) - Resources from 3rd party GitHub repos (future support)
+
+**Example:**
+```json
+{
+  "dependencies": {
+    "agents": [
+      {
+        "name": "skill-builder",
+        "type": "custom-copilot",
+        "source": "agents/skill-builder.agent.md"
+      }
+    ],
+    "prompts": [
+      {
+        "name": "custom",
+        "type": "bundle",
+        "path": "prompts/custom.prompt.md"
+      }
+    ]
+  }
+}
+```
+
+### Private Repository Support Added
+
+You can now add custom sources for private customizations:
+
+```bash
+# Add your company's private repo
+cuco source add company git https://github.com/mycompany/copilot-customs.git
+
+# List sources
+cuco source list
+
+# Configuration is stored in ~/.cuco/config.json
+```
+
+## Previous Changes
 
 ### Directory Structure Simplified
 
-**Previous (copilot-customizations with versioning):**
+**Previous (custom_copilot with versioning):**
 ```
-copilot-customizations/
+custom_copilot/
 ├── agents/
 │   ├── latest/          # Version folders added complexity
 │   └── v1/
@@ -38,7 +89,7 @@ custom_copilot/
 1. **Flat structure** - No more `latest/` and `v1/` subfolders for base resources
 2. **Templates added** - Easy to create new resources from templates
 3. **Versioning only for bundles** - Bundles can be versioned when needed
-4. **Cleaner paths** - `custom_copilot/agents/my-agent.agent.md` instead of `copilot-customizations/agents/latest/my-agent.agent.md`
+4. **Cleaner paths** - `custom_copilot/agents/my-agent.agent.md` instead of `custom_copilot/agents/latest/my-agent.agent.md`
 
 ## Impact
 
@@ -71,8 +122,8 @@ cp custom_copilot/templates/agent-template.agent.md custom_copilot/agents/my-age
 
 ```bash
 # Old way (confusing)
-cp my-skill/ copilot-customizations/skills/latest/
-cp my-skill/ copilot-customizations/skills/v1/  # For compatibility
+cp my-skill/ custom_copilot/skills/latest/
+cp my-skill/ custom_copilot/skills/v1/  # For compatibility
 
 # New way (simple)
 cp -r my-skill/ custom_copilot/skills/
