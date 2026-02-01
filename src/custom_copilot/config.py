@@ -7,6 +7,7 @@ for private bundles and customizations.
 
 import json
 import os
+import subprocess
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -159,3 +160,122 @@ def get_source_by_name(name: str) -> Optional[Dict]:
         if source.get("name") == name:
             return source
     return None
+
+
+def get_repos_cache_path() -> Path:
+    """
+    Get the path to the repositories cache directory.
+    
+    Returns:
+        Path to ~/.cuco/repos/ directory
+    """
+    cache_path = Path.home() / ".cuco" / "repos"
+    cache_path.mkdir(parents=True, exist_ok=True)
+    return cache_path
+
+
+def get_repo_path(source_name: str) -> Path:
+    """
+    Get the path where a source repository is cached.
+    
+    Args:
+        source_name: Name of the source
+        
+    Returns:
+        Path to the cached repository
+    """
+    return get_repos_cache_path() / source_name
+
+
+def clone_or_update_repo(source: Dict) -> Optional[Path]:
+    """
+    Clone or update a git repository from a custom source.
+    
+    Args:
+        source: Source dictionary with 'name', 'type', and 'url' keys
+        
+    Returns:
+        Path to the cloned repository, or None if failed
+    """
+    source_name = source.get("name")
+    source_type = source.get("type")
+    source_url = source.get("url")
+    
+    if source_type != "git":
+        print(f"Warning: Source '{source_name}' is not a git repository")
+        return None
+    
+    repo_path = get_repo_path(source_name)
+    
+    try:
+        if repo_path.exists():
+            # Repository already exists, try to update it
+            print(f"Updating repository '{source_name}'...")
+            result = subprocess.run(
+                ["git", "-C", str(repo_path), "pull"],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+            if result.returncode != 0:
+                print(f"Warning: Failed to update repository: {result.stderr}")
+                # Continue with existing repo even if update fails
+            else:
+                print(f"✓ Updated repository '{source_name}'")
+        else:
+            # Clone the repository
+            print(f"Cloning repository '{source_name}' from {source_url}...")
+            result = subprocess.run(
+                ["git", "clone", source_url, str(repo_path)],
+                capture_output=True,
+                text=True,
+                timeout=120
+            )
+            if result.returncode != 0:
+                print(f"Error: Failed to clone repository: {result.stderr}")
+                print("\nAuthentication options:")
+                print("  1. For HTTPS: Use 'git credential' or set up a personal access token")
+                print("  2. For SSH: Ensure your SSH key is added to ssh-agent")
+                print(f"  3. Try: ssh-add ~/.ssh/id_rsa (or your key path)")
+                return None
+            else:
+                print(f"✓ Cloned repository '{source_name}'")
+        
+        return repo_path
+    
+    except subprocess.TimeoutExpired:
+        print(f"Error: Git operation timed out for '{source_name}'")
+        return None
+    except FileNotFoundError:
+        print("Error: Git is not installed or not in PATH")
+        return None
+    except Exception as e:
+        print(f"Error: Failed to clone/update repository: {e}")
+        return None
+
+
+def get_custom_source_path(source_name: str) -> Optional[Path]:
+    """
+    Get the path to the custom_copilot folder in a custom source repository.
+    
+    Args:
+        source_name: Name of the source
+        
+    Returns:
+        Path to custom_copilot folder in the source, or None if not found
+    """
+    source = get_source_by_name(source_name)
+    if not source:
+        return None
+    
+    repo_path = clone_or_update_repo(source)
+    if not repo_path:
+        return None
+    
+    # Look for custom_copilot folder in the repository
+    custom_copilot_path = repo_path / "custom_copilot"
+    if not custom_copilot_path.exists():
+        print(f"Warning: Repository '{source_name}' does not have a custom_copilot folder")
+        return None
+    
+    return custom_copilot_path

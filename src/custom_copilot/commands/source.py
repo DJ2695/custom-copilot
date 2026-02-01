@@ -28,6 +28,10 @@ def run(args: List[str]) -> int:
         print("Error: Missing source operation")
         print("Usage: cuco source <operation> [args]")
         print("Operations: list, add, remove")
+        print("\nExamples:")
+        print("  cuco source add my-company https://github.com/mycompany/copilot-customs.git")
+        print("  cuco source list")
+        print("  cuco source remove my-company")
         return 1
     
     operation = args[0]
@@ -37,10 +41,13 @@ def run(args: List[str]) -> int:
         if not sources:
             print("No custom sources configured")
             print(f"\nConfiguration file: {get_config_path()}")
-            print("\nAdd a source with: cuco source add <name> <type> <url>")
+            print("\nAdd a git source with: cuco source add <name> <url>")
+            print("\nExamples:")
+            print("  cuco source add my-company https://github.com/mycompany/copilot-customs.git")
+            print("  cuco source add my-company git@github.com:mycompany/copilot-customs.git")
             return 0
         
-        print("Configured custom sources:")
+        print("Configured git sources:")
         for source in sources:
             name = source.get("name", "unknown")
             source_type = source.get("type", "unknown")
@@ -53,23 +60,35 @@ def run(args: List[str]) -> int:
         return 0
     
     elif operation == "add":
-        if len(args) < 4:
+        if len(args) < 3:
             print("Error: Missing arguments")
-            print("Usage: cuco source add <name> <type> <url>")
+            print("Usage: cuco source add <name> <url>")
             print("\nExamples:")
-            print("  cuco source add company-internal git https://github.com/mycompany/copilot-customs.git")
-            print("  cuco source add local-dev local /path/to/local/customizations")
+            print("  # HTTPS (requires git credentials or token)")
+            print("  cuco source add my-company https://github.com/mycompany/copilot-customs.git")
+            print("")
+            print("  # SSH (requires SSH key setup)")
+            print("  cuco source add my-company git@github.com:mycompany/copilot-customs.git")
+            print("")
+            print("Note: The repository must contain a 'custom_copilot' folder with your customizations")
             return 1
         
         name = args[1]
-        source_type = args[2]
-        url = args[3]
+        url = args[2]
         
-        if add_custom_source(name, source_type, url):
-            print(f"✓ Added custom source '{name}'")
-            print(f"  Type: {source_type}")
+        # Validate URL is a git repository
+        if not (url.endswith('.git') or url.startswith('git@') or 'github.com' in url or 'gitlab.com' in url):
+            print("Warning: URL does not appear to be a git repository")
+            print("Continuing anyway...")
+        
+        if add_custom_source(name, "git", url):
+            print(f"✓ Added git source '{name}'")
             print(f"  URL: {url}")
             print(f"\nConfiguration saved to: {get_config_path()}")
+            print(f"\nYou can now reference resources from this source using:")
+            print(f"  \"type\": \"custom\",")
+            print(f"  \"source_name\": \"{name}\",")
+            print(f"  \"source\": \"agents/my-agent.agent.md\"")
             return 0
         else:
             print(f"Error: Failed to add source '{name}'")

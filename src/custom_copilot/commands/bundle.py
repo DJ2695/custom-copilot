@@ -15,6 +15,7 @@ from custom_copilot.utils import (
     calculate_file_hash,
     calculate_dir_hash
 )
+from custom_copilot.config import get_custom_source_path
 
 
 def get_customizations_path() -> Path:
@@ -73,7 +74,7 @@ def load_bundle_manifest(bundle_name: str) -> Optional[Dict]:
 
 def install_bundle_resource(bundle_path: Path, resource_type: str, resource: Dict, dest_dir: Path) -> bool:
     """
-    Install a bundle resource (bundle, custom-copilot, or github).
+    Install a bundle resource (bundle, custom-copilot, custom, or github).
     
     Args:
         bundle_path: Path to the bundle directory
@@ -128,6 +129,43 @@ def install_bundle_resource(bundle_path: Path, resource_type: str, resource: Dic
             shutil.copy2(source_path, dest_path)
         
         print(f"  ✓ Installed {resource_type[:-1]} '{resource_name}' from custom-copilot")
+        return True
+    
+    elif resource_kind == "custom":
+        # Copy from a custom git source repository
+        source_name = resource.get("source_name")
+        source_rel = resource.get("source")
+        
+        if not source_name:
+            print(f"Error: 'custom' type requires 'source_name' field")
+            return False
+        
+        if not source_rel:
+            print(f"Error: 'custom' type requires 'source' field")
+            return False
+        
+        # Get the custom source path (clones/updates repo if needed)
+        custom_source_path = get_custom_source_path(source_name)
+        if not custom_source_path:
+            print(f"Warning: Could not access custom source '{source_name}'")
+            return False
+        
+        source_path = custom_source_path / source_rel
+        
+        if not source_path.exists():
+            print(f"Warning: Custom resource not found: {source_path}")
+            return False
+        
+        if source_path.is_dir():
+            dest_path = dest_dir / resource_name
+            if dest_path.exists():
+                shutil.rmtree(dest_path)
+            shutil.copytree(source_path, dest_path)
+        else:
+            dest_path = dest_dir / source_path.name
+            shutil.copy2(source_path, dest_path)
+        
+        print(f"  ✓ Installed {resource_type[:-1]} '{resource_name}' from custom source '{source_name}'")
         return True
     
     elif resource_kind == "github":

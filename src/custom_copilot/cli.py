@@ -23,9 +23,9 @@ Usage:
     cuco add mcp <name>                        Add an MCP server from registry
     cuco bundle list                           List available bundles
     cuco bundle add <name>                     Install a bundle
-    cuco source list                           List custom sources
-    cuco source add <name> <type> <url>        Add a custom source repository
-    cuco source remove <name>                  Remove a custom source
+    cuco source list                           List configured git sources
+    cuco source add <name> <url>               Add a git source repository
+    cuco source remove <name>                  Remove a git source
     cuco list <type>                           List available artifacts in registry
     cuco sync                                  Sync all artifacts from registry
     cuco sync <artifact-name>                  Sync specific artifact from registry
@@ -36,9 +36,21 @@ Examples:
     cuco add agent skill-builder
     cuco add skill test-driven-development
     cuco bundle add development-essentials
-    cuco source add company git https://github.com/mycompany/copilot-customs.git
+    
+    # Add a private git repository with HTTPS
+    cuco source add my-company https://github.com/mycompany/copilot-customs.git
+    
+    # Add a private git repository with SSH
+    cuco source add my-company git@github.com:mycompany/copilot-customs.git
+    
     cuco source list
     cuco list bundles
+
+Resource Types in bundle.json:
+    "bundle"         - Resources within the bundle itself
+    "custom-copilot" - Resources from the public custom-copilot repository
+    "custom"         - Resources from a configured git source (requires source_name)
+    "github"         - Resources from 3rd party GitHub repos (future support)
 
 For more information, visit: https://github.com/DJ2695/custom-copilot
 """
