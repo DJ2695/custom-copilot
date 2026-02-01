@@ -3,16 +3,51 @@
 ## TL;DR - Installation Commands
 
 ### Public Repository
+
+#### Using pip (Global)
 ```bash
 pip install git+https://github.com/DJ2695/custom-copilot.git
 ```
 
+#### Using uv (Global - Recommended)
+```bash
+# Install as global tool (automatically in PATH)
+uv tool install git+https://github.com/DJ2695/custom-copilot.git
+```
+
+#### Using uv (Project-specific)
+```bash
+# Navigate to your project first
+cd /path/to/your/project
+
+# Add as dev dependency (recommended for tools)
+uv add --dev git+https://github.com/DJ2695/custom-copilot.git
+
+# Then use with:
+uv run cc help
+```
+
 ### Private Repository - SSH
+
+#### Using pip
 ```bash
 pip install git+ssh://git@github.com/DJ2695/custom-copilot.git
 ```
 
+#### Using uv (Global)
+```bash
+uv tool install git+ssh://git@github.com/DJ2695/custom-copilot.git
+```
+
+#### Using uv (Project-specific)
+```bash
+# Add to your project
+uv add --dev git+ssh://git@github.com/DJ2695/custom-copilot.git
+```
+
 ### Private Repository - Personal Access Token
+
+#### Using pip
 ```bash
 # Option 1: Direct (less secure, token visible in history)
 pip install git+https://YOUR_TOKEN@github.com/DJ2695/custom-copilot.git
@@ -22,15 +57,86 @@ export GITHUB_TOKEN=your_token_here
 pip install git+https://${GITHUB_TOKEN}@github.com/DJ2695/custom-copilot.git
 ```
 
+#### Using uv (Global)
+```bash
+# Set token as environment variable
+export GITHUB_TOKEN=your_token_here
+
+# Install as global tool
+uv tool install git+https://${GITHUB_TOKEN}@github.com/DJ2695/custom-copilot.git
+```
+
+#### Using uv (Project-specific)
+```bash
+# Set token as environment variable
+export GITHUB_TOKEN=your_token_here
+
+# Add as dev dependency
+uv add --dev git+https://${GITHUB_TOKEN}@github.com/DJ2695/custom-copilot.git
+```
+
 ### Local Development
+
+#### Using pip
 ```bash
 git clone https://github.com/DJ2695/custom-copilot.git
 cd custom-copilot
 pip install -e .
 ```
 
-## Verify Installation
+#### Using uv (Recommended)
 ```bash
+git clone https://github.com/DJ2695/custom-copilot.git
+cd custom-copilot
+
+# Use uv sync (automatically handles everything)
+uv sync
+
+# Then run commands with:
+uv run cc help
+```
+
+## Verify Installation
+
+### If installed globally
+```bash
+cc help
+```
+
+### If installed in project with uv
+```bash
+uv run cc help
+```
+
+## UV vs PIP: When to Use Which?
+
+### Use `uv tool install` (Global) When:
+- ✅ You want the CLI available everywhere
+- ✅ You use this tool across multiple projects
+- ✅ You want the fastest installation
+- ✅ You want automatic PATH management
+
+### Use `uv add --dev` (Project-specific) When:
+- ✅ You want different versions per project
+- ✅ You want to track dependencies in pyproject.toml
+- ✅ You're working in a team and want reproducible environments
+- ✅ You want to use `uv run cc` to ensure correct version
+
+### Use `pip install` When:
+- ✅ You don't have uv installed
+- ✅ You're in a CI/CD environment
+- ✅ You need traditional Python package management
+
+## Quick uv Setup
+
+```bash
+# Install uv (if not already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Install this package globally
+uv tool install git+https://github.com/DJ2695/custom-copilot.git
+
+# Use it anywhere
 cc help
 ```
 

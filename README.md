@@ -5,7 +5,7 @@ A language-agnostic CLI tool for managing GitHub Copilot customizations in any p
 ## 📋 Requirements
 
 - Python 3.12 or higher
-- pip (Python package installer)
+- pip or [uv](https://github.com/astral-sh/uv) (Python package installers)
 - Git (for installation from repository)
 
 ## 🚀 Installation
@@ -14,7 +14,9 @@ A language-agnostic CLI tool for managing GitHub Copilot customizations in any p
 
 ### Option 1: Install from GitHub (Public Repository)
 
-When the repository is public, you can install directly using pip:
+When the repository is public, you can install directly using pip or uv:
+
+#### Using pip
 
 ```bash
 # Install the latest version from the main branch
@@ -27,20 +29,44 @@ pip install git+https://github.com/DJ2695/custom-copilot.git@your-branch-name
 pip install git+https://github.com/DJ2695/custom-copilot.git@v0.1.0
 ```
 
+#### Using uv (Fast Python package installer)
+
+```bash
+# Install globally with uv
+uv tool install git+https://github.com/DJ2695/custom-copilot.git
+
+# Add to a specific project (creates/updates pyproject.toml)
+uv add git+https://github.com/DJ2695/custom-copilot.git
+
+# Add as a dev dependency to your project
+uv add --dev git+https://github.com/DJ2695/custom-copilot.git
+```
+
 ### Option 2: Install from Private GitHub Repository
 
 If you have access to a private repository, use one of these methods:
 
 #### Using SSH (Recommended for private repos)
 
+**With pip:**
 ```bash
 # First, ensure your SSH key is added to your GitHub account
 # Then install using SSH URL
 pip install git+ssh://git@github.com/DJ2695/custom-copilot.git
 ```
 
+**With uv:**
+```bash
+# Install globally
+uv tool install git+ssh://git@github.com/DJ2695/custom-copilot.git
+
+# Add to project
+uv add git+ssh://git@github.com/DJ2695/custom-copilot.git
+```
+
 #### Using Personal Access Token (PAT)
 
+**With pip:**
 ```bash
 # Create a Personal Access Token (PAT) at:
 # https://github.com/settings/tokens
@@ -54,9 +80,23 @@ export GITHUB_TOKEN=your_token_here
 pip install git+https://${GITHUB_TOKEN}@github.com/DJ2695/custom-copilot.git
 ```
 
+**With uv:**
+```bash
+# Set token as environment variable
+export GITHUB_TOKEN=your_token_here
+
+# Install globally
+uv tool install git+https://${GITHUB_TOKEN}@github.com/DJ2695/custom-copilot.git
+
+# Add to project
+uv add git+https://${GITHUB_TOKEN}@github.com/DJ2695/custom-copilot.git
+```
+
 ### Option 3: Install from Local Source (Development)
 
 For development or if you've cloned the repository:
+
+#### Using pip
 
 ```bash
 # Clone the repository
@@ -65,6 +105,26 @@ cd custom-copilot
 
 # Install in editable mode (changes reflect immediately)
 pip install -e .
+
+# Install with dev dependencies
+pip install -e ".[dev]"
+```
+
+#### Using uv
+
+```bash
+# Clone the repository
+git clone https://github.com/DJ2695/custom-copilot.git
+cd custom-copilot
+
+# Install in editable mode
+uv pip install -e .
+
+# Or use uv sync (recommended for development)
+uv sync
+
+# Install with dev dependencies
+uv pip install -e ".[dev]"
 ```
 
 ### Verify Installation
@@ -75,8 +135,8 @@ After installation, verify the `cc` command is available:
 # Check if cc is installed
 cc help
 
-# Check version
-cc --version  # (if version command is implemented)
+# If installed with uv tool, it's automatically in PATH
+# If using project install, activate your environment first
 ```
 
 ## 🚀 Quick Start
