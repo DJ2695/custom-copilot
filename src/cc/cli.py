@@ -6,7 +6,7 @@ This module provides the main CLI entry point and command routing.
 
 import sys
 from typing import List, Optional
-from cc.commands import init, add, sync
+from cc.commands import init, add, sync, list as list_cmd
 
 
 def print_help():
@@ -20,6 +20,8 @@ Usage:
     cc add prompt <name>                     Add a prompt from registry
     cc add instructions <name>               Add instructions from registry
     cc add skill <name>                      Add a skill from registry
+    cc add mcp <name>                        Add an MCP server from registry
+    cc list <type>                           List available artifacts in registry
     cc sync                                  Sync all artifacts from registry
     cc sync <artifact-name>                  Sync specific artifact from registry
     cc help                                  Show this help message
@@ -28,6 +30,9 @@ Examples:
     cc init
     cc add agent skill-builder
     cc add skill test-driven-development
+    cc add mcp context7
+    cc list skills
+    cc list mcps
     cc sync
     cc sync skill-builder
 
@@ -62,6 +67,8 @@ def main(args: Optional[List[str]] = None) -> int:
             return add.run(args[1:])
         elif command == "sync":
             return sync.run(args[1:])
+        elif command == "list":
+            return list_cmd.run(args[1:])
         else:
             print(f"Error: Unknown command '{command}'")
             print("Run 'cc help' for usage information.")

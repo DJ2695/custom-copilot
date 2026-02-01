@@ -15,6 +15,7 @@ from cc.utils import (
     calculate_file_hash,
     calculate_dir_hash
 )
+from cc.commands import mcp
 
 
 def list_available_artifacts(artifact_type: str) -> List[str]:
@@ -126,13 +127,24 @@ def run(args: List[str]) -> int:
     Returns:
         Exit code (0 for success, 1 for error)
     """
-    if len(args) < 2:
-        print("Error: Missing arguments")
+    if len(args) < 1:
+        print("Error: Missing artifact type")
         print("Usage: cc add <type> <name>")
-        print("Types: agent, prompt, instructions, skill")
+        print("Types: agent, prompt, instructions, skill, mcp")
         return 1
     
     artifact_type_singular = args[0]
+    
+    # Handle MCP separately
+    if artifact_type_singular == "mcp":
+        return mcp.run(args[1:])
+    
+    if len(args) < 2:
+        print("Error: Missing artifact name")
+        print("Usage: cc add <type> <name>")
+        print("Types: agent, prompt, instructions, skill, mcp")
+        return 1
+    
     artifact_name = args[1]
     
     # Convert singular to plural for directory names
@@ -145,7 +157,7 @@ def run(args: List[str]) -> int:
     
     if artifact_type_singular not in type_mapping:
         print(f"Error: Unknown artifact type '{artifact_type_singular}'")
-        print("Valid types: agent, prompt, instructions, skill")
+        print("Valid types: agent, prompt, instructions, skill, mcp")
         return 1
     
     artifact_type = type_mapping[artifact_type_singular]

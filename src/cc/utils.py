@@ -70,7 +70,7 @@ def save_tracking_data(data: Dict) -> None:
     tracking_file = get_tracking_file_path()
     tracking_file.parent.mkdir(parents=True, exist_ok=True)
     with open(tracking_file, 'w') as f:
-        json.dump(data, indent=2, fp=f)
+        json.dump(data, f, indent=2)
 
 
 def calculate_file_hash(file_path: Path) -> str:

@@ -1,6 +1,6 @@
 # Custom Copilot CLI (`cc`)
 
-A language-agnostic CLI tool for managing GitHub Copilot customizations in any project. The `cc` tool helps you initialize, add, and sync GitHub Copilot artifacts including agents, prompts, instructions, and skills.
+A language-agnostic CLI tool for managing GitHub Copilot customizations in any project. The `cc` tool helps you initialize, add, and sync GitHub Copilot artifacts including agents, prompts, instructions, skills, and MCP servers.
 
 ## 🚀 Quick Start
 
@@ -33,6 +33,16 @@ your-project/
     └── copilot-instructions.md
 ```
 
+### List Available Artifacts
+
+```bash
+# List available artifacts in the registry
+cc list skills
+cc list prompts
+cc list agents
+cc list mcps
+```
+
 ### Add Artifacts
 
 ```bash
@@ -47,6 +57,9 @@ cc add instructions sample
 
 # Add a skill
 cc add skill test-driven-development
+
+# Add an MCP server (automatically handles .env setup)
+cc add mcp context7
 ```
 
 ### Sync Artifacts
@@ -91,6 +104,7 @@ cc add agent <name>
 cc add prompt <name>
 cc add instructions <name>
 cc add skill <name>
+cc add mcp <name>
 ```
 
 **Examples:**
@@ -98,12 +112,54 @@ cc add skill <name>
 cc add agent skill-builder
 cc add prompt git
 cc add skill test-driven-development
+cc add mcp context7
 ```
 
 **What it does:**
 - Copies the artifact from the package registry to `.github/<type>/`
 - Tracks the artifact in `.github/.cc-tracking.json`
 - Prompts for confirmation if artifact already exists
+- **For MCPs**: 
+  - Adds MCP server configuration to `.vscode/mcp.json`
+  - Detects environment variables (e.g., `${env:API_KEY}`)
+  - Creates/updates `.env` file with required variables
+  - Prompts you to set the values
+
+### `cc list <type>`
+
+List available artifacts in the package registry.
+
+**Usage:**
+```bash
+cc list agents
+cc list prompts
+cc list instructions
+cc list skills
+cc list mcps
+```
+
+**Examples:**
+```bash
+cc list skills
+# Output:
+# Available skills:
+#   - skill-creator
+#   - systematic-debugging
+#   - test-driven-development
+#   ...
+
+cc list mcps
+# Output:
+# Available mcps:
+#   - context7
+#   - serena
+#   - sequential-thinking
+#   ...
+```
+
+**What it does:**
+- Shows all available artifacts of the specified type from the registry
+- Helps you discover what's available before adding
 
 ### `cc sync [artifact-name]`
 
