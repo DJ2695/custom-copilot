@@ -152,8 +152,11 @@ def add_from_github_url(url: str, artifact_type: str) -> bool:
     dest_dir = get_github_dir() / artifact_type
     dest_dir.mkdir(parents=True, exist_ok=True)
     
+    # Valid file extensions for direct file downloads
+    VALID_EXTENSIONS = {'.md', '.agent.md', '.prompt.md'}
+    
     # Case 1: Direct file URL (e.g., pointing to a SKILL.md file)
-    if path and (path.endswith(".md") or path.endswith(".agent.md") or path.endswith(".prompt.md")):
+    if path and any(path.endswith(ext) for ext in VALID_EXTENSIONS):
         print(f"Downloading {path} from {owner}/{repo}...")
         temp_file = download_github_file(owner, repo, path, ref)
         

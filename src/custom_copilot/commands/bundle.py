@@ -189,8 +189,11 @@ def install_bundle_resource(bundle_path: Path, resource_type: str, resource: Dic
         path = github_info["path"]
         ref = github_info["ref"]
         
-        # For file URLs
-        if path and (path.endswith(".md") or "." in Path(path).name):
+        # Valid file extensions for direct file downloads
+        VALID_EXTENSIONS = {'.md', '.agent.md', '.prompt.md', '.json', '.yaml', '.yml'}
+        
+        # For file URLs (check using suffix, not checking for '.' in name)
+        if path and Path(path).suffix in VALID_EXTENSIONS:
             print(f"  Downloading {resource_name} from GitHub...")
             temp_file = download_github_file(owner, repo, path, ref)
             

@@ -370,6 +370,7 @@ def download_github_file(owner: str, repo: str, path: str, ref: str = "main") ->
     # Construct raw URL
     raw_url = f"https://raw.githubusercontent.com/{owner}/{repo}/{ref}/{path}"
     
+    temp_path = None
     try:
         # Create a temp file with appropriate extension
         suffix = Path(path).suffix or ".md"
@@ -377,11 +378,25 @@ def download_github_file(owner: str, repo: str, path: str, ref: str = "main") ->
         temp_path = Path(temp_file.name)
         temp_file.close()
         
-        # Download the file
+        # Download the file with timeout
+        import urllib.request
+        import socket
+        
+        # Set a 30 second timeout
+        socket.setdefaulttimeout(30)
         urllib.request.urlretrieve(raw_url, temp_path)
+        
+        # Basic size validation (reject files > 10MB)
+        if temp_path.stat().st_size > 10 * 1024 * 1024:
+            temp_path.unlink()
+            print("Error: Downloaded file exceeds 10MB size limit")
+            return None
+        
         return temp_path
     except Exception as e:
         print(f"Error downloading file from GitHub: {e}")
+        if temp_path and temp_path.exists():
+            temp_path.unlink()
         return None
 
 
