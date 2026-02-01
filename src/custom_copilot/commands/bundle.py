@@ -169,10 +169,118 @@ def install_bundle_resource(bundle_path: Path, resource_type: str, resource: Dic
         return True
     
     elif resource_kind == "github":
-        # Future support for GitHub repositories
-        print(f"  ⚠ GitHub resources not yet supported: '{resource_name}'")
-        print(f"    URL: {resource.get('url', 'not specified')}")
-        return False
+        # Support for direct GitHub URLs
+        github_url = resource.get("url")
+        
+        if not github_url:
+            print(f"Error: 'github' type requires 'url' field")
+            return False
+        
+        # Import here to avoid circular dependency
+        from custom_copilot.config import parse_github_url, download_github_file, clone_or_update_repo
+        
+        github_info = parse_github_url(github_url)
+        if not github_info:
+            print(f"Error: Invalid GitHub URL: {github_url}")
+            return False
+        
+        owner = github_info["owner"]
+        repo = github_info["repo"]
+        path = github_info["path"]
+        ref = github_info["ref"]
+        
+        # For file URLs
+        if path and (path.endswith(".md") or "." in Path(path).name):
+            print(f"  Downloading {resource_name} from GitHub...")
+            temp_file = download_github_file(owner, repo, path, ref)
+            
+            if not temp_file:
+                print(f"  ⚠ Failed to download from GitHub: {github_url}")
+                return False
+            
+            # Determine destination
+            file_name = Path(path).name
+            dest_path = dest_dir / file_name
+            shutil.copy2(temp_file, dest_path)
+            temp_file.unlink()
+            
+            print(f"  ✓ Installed {resource_type[:-1]} '{resource_name}' from GitHub")
+            return True
+        else:
+            # For folder/repo URLs - clone and copy
+            print(f"  Cloning {owner}/{repo} from GitHub...")
+            temp_source = {
+                "name": f"{owner}_{repo}_bundle",
+                "type": "git",
+                "url": f"https://github.com/{owner}/{repo}.git"
+            }
+            
+            repo_path = clone_or_update_repo(temp_source)
+            if not repo_path:
+                print(f"  ⚠ Failed to clone from GitHub: {github_url}")
+                return False
+            
+            # Determine source path
+            source_path = repo_path / path if path else repo_path
+            
+            if not source_path.exists():
+                print(f"  ⚠ Path not found in repository: {path}")
+                return False
+            
+            # Copy to destination
+            if source_path.is_dir():
+                dest_path = dest_dir / resource_name
+                if dest_path.exists():
+                    shutil.rmtree(dest_path)
+                shutil.copytree(source_path, dest_path)
+            else:
+                dest_path = dest_dir / source_path.name
+                shutil.copy2(source_path, dest_path)
+            
+            print(f"  ✓ Installed {resource_type[:-1]} '{resource_name}' from GitHub")
+            return True
+    
+    elif resource_kind == "agentskills":
+        # Support for agentskills.io repositories
+        # Format: { "type": "agentskills", "repo": "owner/repo", "skill": "skill-name" }
+        repo_ref = resource.get("repo", "anthropics/skills")  # Default to anthropics/skills
+        skill_name = resource.get("skill") or resource_name
+        
+        print(f"  Installing skill '{skill_name}' from agentskills repo '{repo_ref}'...")
+        
+        # Parse repo reference
+        if "/" in repo_ref:
+            owner, repo = repo_ref.split("/", 1)
+        else:
+            owner, repo = "anthropics", repo_ref
+        
+        # Clone the repository
+        from custom_copilot.config import clone_or_update_repo
+        temp_source = {
+            "name": f"agentskills_{owner}_{repo}",
+            "type": "git",
+            "url": f"https://github.com/{owner}/{repo}.git"
+        }
+        
+        repo_path = clone_or_update_repo(temp_source)
+        if not repo_path:
+            print(f"  ⚠ Failed to clone agentskills repository")
+            return False
+        
+        # Look for the skill in skills/ folder
+        skill_path = repo_path / "skills" / skill_name
+        if not skill_path.exists() or not (skill_path / "SKILL.md").exists():
+            print(f"  ⚠ Skill '{skill_name}' not found in repository")
+            return False
+        
+        # Copy the skill folder
+        dest_path = dest_dir / skill_name
+        if dest_path.exists():
+            shutil.rmtree(dest_path)
+        shutil.copytree(skill_path, dest_path)
+        
+        print(f"  ✓ Installed skill '{skill_name}' from agentskills repository")
+        return True
     
     # Support legacy "inline" and "reference" types for backward compatibility
     elif resource_kind == "inline":

@@ -16,6 +16,12 @@ from custom_copilot.utils import (
     calculate_dir_hash
 )
 from custom_copilot.commands import mcp
+from custom_copilot.config import (
+    parse_github_url,
+    download_github_file,
+    clone_or_update_repo,
+    get_repos_cache_path
+)
 
 
 def list_available_artifacts(artifact_type: str) -> List[str]:
@@ -117,6 +123,135 @@ def copy_artifact(artifact_type: str, artifact_name: str) -> bool:
         return False
 
 
+def add_from_github_url(url: str, artifact_type: str) -> bool:
+    """
+    Add an artifact directly from a GitHub URL.
+    
+    Supports:
+    - Direct file URLs (e.g., SKILL.md)
+    - Folder URLs (will clone and copy folder)
+    - Repository URLs (will auto-detect structure)
+    
+    Args:
+        url: GitHub URL
+        artifact_type: Type of artifact (agents, prompts, skills, etc.)
+        
+    Returns:
+        True if successful, False otherwise
+    """
+    github_info = parse_github_url(url)
+    if not github_info:
+        print(f"Error: Invalid GitHub URL: {url}")
+        return False
+    
+    owner = github_info["owner"]
+    repo = github_info["repo"]
+    path = github_info["path"]
+    ref = github_info["ref"]
+    
+    dest_dir = get_github_dir() / artifact_type
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Case 1: Direct file URL (e.g., pointing to a SKILL.md file)
+    if path and (path.endswith(".md") or path.endswith(".agent.md") or path.endswith(".prompt.md")):
+        print(f"Downloading {path} from {owner}/{repo}...")
+        temp_file = download_github_file(owner, repo, path, ref)
+        
+        if not temp_file:
+            return False
+        
+        # Determine artifact name from path
+        file_name = Path(path).name
+        artifact_name = Path(path).parent.name if Path(path).parent.name != "." else Path(path).stem
+        
+        dest_path = dest_dir / file_name
+        
+        # Check if artifact already exists
+        if dest_path.exists():
+            response = input(f"File '{file_name}' already exists. Overwrite? [y/N]: ")
+            if response.lower() != 'y':
+                temp_file.unlink()
+                print("Cancelled.")
+                return False
+        
+        # Copy the file
+        shutil.copy2(temp_file, dest_path)
+        temp_file.unlink()
+        
+        print(f"✓ Added {artifact_type[:-1]} from GitHub to .github/{artifact_type}/{file_name}")
+        return True
+    
+    # Case 2: Folder or repository URL - clone and extract
+    else:
+        print(f"Cloning repository {owner}/{repo}...")
+        
+        # Create a temporary source entry
+        temp_source = {
+            "name": f"{owner}_{repo}",
+            "type": "git",
+            "url": f"https://github.com/{owner}/{repo}.git"
+        }
+        
+        # Clone/update the repo
+        repo_path = clone_or_update_repo(temp_source)
+        if not repo_path:
+            return False
+        
+        # Determine what to copy based on path
+        if path:
+            # Specific folder path provided
+            source_path = repo_path / path
+            if not source_path.exists():
+                print(f"Error: Path '{path}' not found in repository")
+                return False
+            
+            artifact_name = source_path.name
+            dest_path = dest_dir / artifact_name
+            
+            if dest_path.exists():
+                response = input(f"Artifact '{artifact_name}' already exists. Overwrite? [y/N]: ")
+                if response.lower() != 'y':
+                    print("Cancelled.")
+                    return False
+                if dest_path.is_dir():
+                    shutil.rmtree(dest_path)
+            
+            if source_path.is_dir():
+                shutil.copytree(source_path, dest_path)
+            else:
+                shutil.copy2(source_path, dest_path)
+            
+            print(f"✓ Added {artifact_type[:-1]} '{artifact_name}' from GitHub")
+            return True
+        else:
+            # No specific path - need to auto-detect structure
+            print("Auto-detecting repository structure...")
+            
+            # Check for agentskills.io structure (skills/ folder)
+            skills_folder = repo_path / "skills"
+            if artifact_type == "skills" and skills_folder.exists():
+                print(f"Found agentskills.io structure")
+                print(f"Available skills:")
+                
+                available_skills = []
+                for item in skills_folder.iterdir():
+                    if item.is_dir() and (item / "SKILL.md").exists():
+                        available_skills.append(item.name)
+                        print(f"  - {item.name}")
+                
+                if not available_skills:
+                    print("No skills found with SKILL.md files")
+                    return False
+                
+                # For now, return false and tell user to specify the skill
+                print(f"\nPlease specify which skill to add:")
+                print(f"  cuco add skill {url}/skills/<skill-name>")
+                return False
+            
+            print("Could not auto-detect structure. Please provide a specific path.")
+            return False
+
+
 def run(args: List[str]) -> int:
     """
     Run the add command.
@@ -168,7 +303,19 @@ def run(args: List[str]) -> int:
         print("Run 'cuco init' first to initialize the structure")
         return 1
     
-    # Copy the artifact
+    # Check if artifact_name is a GitHub URL
+    if artifact_name.startswith("http://") or artifact_name.startswith("https://"):
+        if "github.com" in artifact_name:
+            print(f"Detected GitHub URL, fetching {artifact_type_singular}...")
+            if add_from_github_url(artifact_name, artifact_type):
+                return 0
+            else:
+                return 1
+        else:
+            print("Error: Only GitHub URLs are currently supported")
+            return 1
+    
+    # Copy the artifact from registry
     if copy_artifact(artifact_type, artifact_name):
         return 0
     else:
