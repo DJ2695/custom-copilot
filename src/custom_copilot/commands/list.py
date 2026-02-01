@@ -8,8 +8,8 @@ in the package registry.
 import json
 from pathlib import Path
 from typing import List
-from cc.utils import get_registry_path
-from cc.commands.bundle import list_available_bundles, load_bundle_manifest
+from custom_copilot.utils import get_registry_path
+from custom_copilot.commands.bundle import list_available_bundles, load_bundle_manifest
 
 
 def list_mcp_servers() -> List[str]:

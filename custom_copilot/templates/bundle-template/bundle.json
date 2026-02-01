@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Brief description of what this bundle provides",
   "copilotInstructions": {
-    "type": "inline",
+    "type": "bundle",
     "path": "copilot-instructions.md",
     "description": "Instructions on how to use this bundle"
   },
@@ -11,7 +11,7 @@
     "agents": [
       {
         "name": "agent-name",
-        "type": "reference",
+        "type": "custom-copilot",
         "source": "agents/agent-name.agent.md",
         "description": "Description of why this agent is included"
       }
@@ -19,15 +19,21 @@
     "prompts": [
       {
         "name": "prompt-name",
-        "type": "reference",
+        "type": "custom-copilot",
         "source": "prompts/prompt-name.prompt.md",
         "description": "Description of why this prompt is included"
+      },
+      {
+        "name": "bundle-specific-prompt",
+        "type": "bundle",
+        "path": "prompts/bundle-specific.prompt.md",
+        "description": "Bundle-specific resource included in this bundle"
       }
     ],
     "skills": [
       {
         "name": "skill-name",
-        "type": "reference",
+        "type": "custom-copilot",
         "source": "skills/skill-name",
         "description": "Description of why this skill is included"
       }

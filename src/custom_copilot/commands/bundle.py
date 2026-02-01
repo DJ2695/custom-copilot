@@ -9,7 +9,7 @@ import json
 import shutil
 from pathlib import Path
 from typing import List, Dict, Optional
-from cc.utils import (
+from custom_copilot.utils import (
     get_github_dir,
     track_artifact,
     calculate_file_hash,
@@ -73,7 +73,7 @@ def load_bundle_manifest(bundle_name: str) -> Optional[Dict]:
 
 def install_bundle_resource(bundle_path: Path, resource_type: str, resource: Dict, dest_dir: Path) -> bool:
     """
-    Install a bundle resource (inline or reference).
+    Install a bundle resource (bundle, custom-copilot, or github).
     
     Args:
         bundle_path: Path to the bundle directory
@@ -87,8 +87,8 @@ def install_bundle_resource(bundle_path: Path, resource_type: str, resource: Dic
     resource_name = resource.get("name")
     resource_kind = resource.get("type")
     
-    if resource_kind == "inline":
-        # Copy from bundle directory
+    if resource_kind == "bundle":
+        # Copy from bundle directory (formerly "inline")
         source_path_rel = resource.get("path")
         source_path = bundle_path / source_path_rel
         
@@ -105,11 +105,11 @@ def install_bundle_resource(bundle_path: Path, resource_type: str, resource: Dic
             dest_path = dest_dir / source_path.name
             shutil.copy2(source_path, dest_path)
         
-        print(f"  ✓ Installed inline {resource_type[:-1]} '{resource_name}'")
+        print(f"  ✓ Installed bundle {resource_type[:-1]} '{resource_name}'")
         return True
         
-    elif resource_kind == "reference":
-        # Copy from customizations directory
+    elif resource_kind == "custom-copilot":
+        # Copy from customizations directory (formerly "reference")
         source_rel = resource.get("source")
         customizations_path = get_customizations_path()
         source_path = customizations_path / source_rel
@@ -127,9 +127,25 @@ def install_bundle_resource(bundle_path: Path, resource_type: str, resource: Dic
             dest_path = dest_dir / source_path.name
             shutil.copy2(source_path, dest_path)
         
-        version = resource.get("version", "unknown")
-        print(f"  ✓ Installed {resource_type[:-1]} '{resource_name}' (version: {version})")
+        print(f"  ✓ Installed {resource_type[:-1]} '{resource_name}' from custom-copilot")
         return True
+    
+    elif resource_kind == "github":
+        # Future support for GitHub repositories
+        print(f"  ⚠ GitHub resources not yet supported: '{resource_name}'")
+        print(f"    URL: {resource.get('url', 'not specified')}")
+        return False
+    
+    # Support legacy "inline" and "reference" types for backward compatibility
+    elif resource_kind == "inline":
+        print(f"  ⚠ Warning: 'inline' type is deprecated, use 'bundle' instead")
+        resource["type"] = "bundle"
+        return install_bundle_resource(bundle_path, resource_type, resource, dest_dir)
+    
+    elif resource_kind == "reference":
+        print(f"  ⚠ Warning: 'reference' type is deprecated, use 'custom-copilot' instead")
+        resource["type"] = "custom-copilot"
+        return install_bundle_resource(bundle_path, resource_type, resource, dest_dir)
     
     return False
 

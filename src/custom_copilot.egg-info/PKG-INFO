@@ -1,32 +1,177 @@
 Metadata-Version: 2.4
 Name: custom-copilot
 Version: 0.1.0
-Summary: Custom Copilot CLI - A tool for managing GitHub Copilot artifacts
+Summary: Custom Copilot CLI - A tool for managing GitHub Copilot customizations
+Author-email: DJ2695 <35080988+DJ2695@users.noreply.github.com>
+License: MIT
+Project-URL: Homepage, https://github.com/DJ2695/custom-copilot
+Project-URL: Repository, https://github.com/DJ2695/custom-copilot
+Project-URL: Issues, https://github.com/DJ2695/custom-copilot/issues
+Keywords: github,copilot,cli,mcp,agents,prompts,skills,customizations
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Utilities
 Requires-Python: >=3.12
 Description-Content-Type: text/markdown
+License-File: LICENSE
+Provides-Extra: dev
+Requires-Dist: build>=1.0.0; extra == "dev"
+Dynamic: license-file
 
-# Custom Copilot CLI (`cc`)
+# Custom Copilot CLI (`cuco`)
 
-A language-agnostic CLI tool for managing GitHub Copilot customizations in any project. The `cc` tool helps you initialize, add, and sync GitHub Copilot artifacts including agents, prompts, instructions, skills, and MCP servers.
+A language-agnostic CLI tool for managing GitHub Copilot customizations in any project. The `cuco` tool helps you initialize, add, and sync GitHub Copilot artifacts including agents, prompts, instructions, skills, and MCP servers.
 
-## 🚀 Quick Start
+## 📋 Requirements
 
-### Installation
+- Python 3.12 or higher
+- pip or [uv](https://github.com/astral-sh/uv) (Python package installers)
+- Git (for installation from repository)
+
+## 🚀 Installation
+
+> **📖 For detailed installation instructions, troubleshooting, and platform-specific notes, see [INSTALL.md](INSTALL.md)**
+
+### Option 1: Install from GitHub (Public Repository)
+
+When the repository is public, you can install directly using pip or uv:
+
+#### Using pip
 
 ```bash
-# Install from source
+# Install the latest version from the main branch
+pip install git+https://github.com/DJ2695/custom-copilot.git
+
+# Install from a specific branch
+pip install git+https://github.com/DJ2695/custom-copilot.git@your-branch-name
+
+# Install from a specific tag/release
+pip install git+https://github.com/DJ2695/custom-copilot.git@v0.1.0
+```
+
+#### Using uv (Fast Python package installer)
+
+```bash
+# Install globally with uv
+uv tool install git+https://github.com/DJ2695/custom-copilot.git
+
+# Add to a specific project (creates/updates pyproject.toml)
+uv add git+https://github.com/DJ2695/custom-copilot.git
+
+# Add as a dev dependency to your project
+uv add --dev git+https://github.com/DJ2695/custom-copilot.git
+```
+
+### Option 2: Install from Private GitHub Repository
+
+If you have access to a private repository, use one of these methods:
+
+#### Using SSH (Recommended for private repos)
+
+**With pip:**
+```bash
+# First, ensure your SSH key is added to your GitHub account
+# Then install using SSH URL
+pip install git+ssh://git@github.com/DJ2695/custom-copilot.git
+```
+
+**With uv:**
+```bash
+# Install globally
+uv tool install git+ssh://git@github.com/DJ2695/custom-copilot.git
+
+# Add to project
+uv add git+ssh://git@github.com/DJ2695/custom-copilot.git
+```
+
+#### Using Personal Access Token (PAT)
+
+**With pip:**
+```bash
+# Create a Personal Access Token (PAT) at:
+# https://github.com/settings/tokens
+# With 'repo' scope for private repositories
+
+# Install using PAT (replace YOUR_TOKEN with your actual token)
+pip install git+https://YOUR_TOKEN@github.com/DJ2695/custom-copilot.git
+
+# Or set it as an environment variable for better security
+export GITHUB_TOKEN=your_token_here
+pip install git+https://${GITHUB_TOKEN}@github.com/DJ2695/custom-copilot.git
+```
+
+**With uv:**
+```bash
+# Set token as environment variable
+export GITHUB_TOKEN=your_token_here
+
+# Install globally
+uv tool install git+https://${GITHUB_TOKEN}@github.com/DJ2695/custom-copilot.git
+
+# Add to project
+uv add git+https://${GITHUB_TOKEN}@github.com/DJ2695/custom-copilot.git
+```
+
+### Option 3: Install from Local Source (Development)
+
+For development or if you've cloned the repository:
+
+#### Using pip
+
+```bash
+# Clone the repository
+git clone https://github.com/DJ2695/custom-copilot.git
+cd custom-copilot
+
+# Install in editable mode (changes reflect immediately)
 pip install -e .
 
-# The 'cc' command will now be available globally
-cc help
+# Install with dev dependencies
+pip install -e ".[dev]"
 ```
+
+#### Using uv
+
+```bash
+# Clone the repository
+git clone https://github.com/DJ2695/custom-copilot.git
+cd custom-copilot
+
+# Install in editable mode
+uv pip install -e .
+
+# Or use uv sync (recommended for development)
+uv sync
+
+# Install with dev dependencies
+uv pip install -e ".[dev]"
+```
+
+### Verify Installation
+
+After installation, verify the `cuco` command is available:
+
+```bash
+# Check if cuco is installed
+cuco help
+
+# If installed with uv tool, it's automatically in PATH
+# If using project install, activate your environment first
+```
+
+## 🚀 Quick Start
 
 ### Initialize a Project
 
 ```bash
 # Create .github folder structure
 cd your-project
-cc init
+cuco init
 ```
 
 This creates:
@@ -44,30 +189,49 @@ your-project/
 
 ```bash
 # List available artifacts in the registry
-cc list skills
-cc list prompts
-cc list agents
-cc list mcps
+cuco list skills
+cuco list prompts
+cuco list agents
+cuco list mcps
+cuco list bundles
 ```
 
 ### Add Artifacts
 
 ```bash
 # Add an agent
-cc add agent skill-builder
+cuco add agent skill-builder
 
 # Add a prompt
-cc add prompt git
+cuco add prompt git
 
 # Add instructions
-cc add instructions sample
+cuco add instructions sample
 
 # Add a skill
-cc add skill test-driven-development
+cuco add skill test-driven-development
 
 # Add an MCP server (automatically handles .env setup)
-cc add mcp context7
+cuco add mcp context7
 ```
+
+### Working with Bundles
+
+Bundles are pre-configured combinations of copilot customizations that work together:
+
+```bash
+# List available bundles
+cuco bundle list
+cuco list bundles
+
+# Install a bundle (includes all dependencies)
+cuco bundle add example-bundle
+```
+
+A bundle automatically installs:
+- Copilot instructions (bundle-specific guidance)
+- Referenced agents, prompts, skills (from versioned registry)
+- Inline resources (bundle-specific customizations)
 
 ### Sync Artifacts
 
@@ -75,25 +239,25 @@ Keep your artifacts up to date with the registry:
 
 ```bash
 # Sync all tracked artifacts
-cc sync
+cuco sync
 
 # Sync a specific artifact
-cc sync test-driven-development
+cuco sync test-driven-development
 ```
 
-If you've made local modifications, `cc sync` will prompt you to:
+If you've made local modifications, `cuco sync` will prompt you to:
 - Overwrite with the registry version
 - Keep your local changes
 
 ## 📖 Commands
 
-### `cc init`
+### `cuco init`
 
 Initialize the `.github` folder structure in your project.
 
 **Usage:**
 ```bash
-cc init
+cuco init
 ```
 
 **What it does:**
@@ -101,30 +265,30 @@ cc init
 - Creates subdirectories: `agents/`, `prompts/`, `instructions/`, `skills/`
 - Creates empty `copilot-instructions.md` file
 
-### `cc add <type> <name>`
+### `cuco add <type> <name>`
 
 Add an artifact from the package registry to your project.
 
 **Usage:**
 ```bash
-cc add agent <name>
-cc add prompt <name>
-cc add instructions <name>
-cc add skill <name>
-cc add mcp <name>
+cuco add agent <name>
+cuco add prompt <name>
+cuco add instructions <name>
+cuco add skill <name>
+cuco add mcp <name>
 ```
 
 **Examples:**
 ```bash
-cc add agent skill-builder
-cc add prompt git
-cc add skill test-driven-development
-cc add mcp context7
+cuco add agent skill-builder
+cuco add prompt git
+cuco add skill test-driven-development
+cuco add mcp context7
 ```
 
 **What it does:**
 - Copies the artifact from the package registry to `.github/<type>/`
-- Tracks the artifact in `.github/.cc-tracking.json`
+- Tracks the artifact in `.github/.cuco-tracking.json`
 - Prompts for confirmation if artifact already exists
 - **For MCPs**: 
   - Adds MCP server configuration to `.vscode/mcp.json`
@@ -132,22 +296,23 @@ cc add mcp context7
   - Creates/updates `.env` file with required variables
   - Prompts you to set the values
 
-### `cc list <type>`
+### `cuco list <type>`
 
 List available artifacts in the package registry.
 
 **Usage:**
 ```bash
-cc list agents
-cc list prompts
-cc list instructions
-cc list skills
-cc list mcps
+cuco list agents
+cuco list prompts
+cuco list instructions
+cuco list skills
+cuco list mcps
+cuco list bundles
 ```
 
 **Examples:**
 ```bash
-cc list skills
+cuco list skills
 # Output:
 # Available skills:
 #   - skill-creator
@@ -155,36 +320,78 @@ cc list skills
 #   - test-driven-development
 #   ...
 
-cc list mcps
+cuco list mcps
 # Output:
 # Available mcps:
 #   - context7
 #   - serena
 #   - sequential-thinking
 #   ...
+
+cuco list bundles
+# Output:
+# Available bundles:
+#   - example-bundle (v1.0.0)
+#     Example bundle demonstrating the bundle structure
 ```
 
 **What it does:**
 - Shows all available artifacts of the specified type from the registry
 - Helps you discover what's available before adding
 
-### `cc sync [artifact-name]`
+### `cuco bundle <operation> [args]`
+
+Manage bundles - pre-configured combinations of copilot customizations.
+
+**Usage:**
+```bash
+cuco bundle list              # List available bundles
+cuco bundle add <name>        # Install a bundle
+```
+
+**Examples:**
+```bash
+cuco bundle list
+# Output:
+# Available bundles:
+#   - example-bundle (v1.0.0)
+#     Example bundle demonstrating the bundle structure
+
+cuco bundle add example-bundle
+# Installs:
+#   - copilot-instructions.md (bundle-specific guidance)
+#   - Referenced agents (from versioned registry)
+#   - Referenced prompts (from versioned registry)
+#   - Referenced skills (from versioned registry)
+#   - Inline resources (bundle-specific customizations)
+```
+
+**What it does:**
+- **list**: Shows all available bundles with versions and descriptions
+- **add**: Installs a bundle with all its dependencies:
+  - Copies copilot-instructions.md (if included)
+  - Installs referenced resources from versioned registry
+  - Installs inline resources specific to the bundle
+  - Ensures all dependencies are available
+- Prompts for confirmation when overwriting existing files
+
+### `cuco sync [artifact-name]`
 
 Sync artifacts with the package registry.
 
 **Usage:**
 ```bash
 # Sync all tracked artifacts
-cc sync
+cuco sync
 
 # Sync specific artifact
-cc sync <artifact-name>
+cuco sync <artifact-name>
 ```
 
 **Examples:**
 ```bash
-cc sync                          # Sync everything
-cc sync test-driven-development  # Sync specific skill
+cuco sync                          # Sync everything
+cuco sync test-driven-development  # Sync specific skill
 ```
 
 **What it does:**
@@ -207,19 +414,89 @@ src/cc/
 ├── utils.py              # Utilities (hashing, tracking)
 ├── commands/             # Command implementations
 │   ├── __init__.py
-│   ├── init.py          # cc init command
-│   ├── add.py           # cc add command
-│   └── sync.py          # cc sync command
-└── registry/             # Bundled artifacts
+│   ├── init.py          # cuco init command
+│   ├── add.py           # cuco add command
+│   ├── bundle.py        # cuco bundle command
+│   └── sync.py          # cuco sync command
+└── registry/             # Bundled artifacts (legacy)
     ├── agents/
     ├── prompts/
     ├── instructions/
     └── skills/
+
+custom_copilot/          # Customization resources
+├── agents/              # Flat, no version folders
+├── prompts/             # Flat, no version folders
+├── skills/              # Flat, no version folders
+├── instructions/        # Flat, no version folders
+├── bundles/             # Pre-configured bundles (can be versioned)
+│   └── example-bundle/
+│       ├── bundle.json
+│       ├── copilot-instructions.md
+│       └── prompts/     # Bundle-specific resources (inline)
+└── templates/           # Templates for new resources
+    ├── agent-template.agent.md
+    ├── prompt-template.prompt.md
+    ├── skill-template/
+    └── bundle-template/
 ```
+
+### Resource Organization
+
+Resources in `custom_copilot/` use a flat structure without version folders:
+
+- Base resources (agents, prompts, skills, instructions) have no versioning
+- Resources are updated in place
+- Bundles can optionally be versioned if needed
+- Templates provide starting points for new resources
+
+**Example:**
+```
+custom_copilot/
+├── agents/
+│   └── skill-builder.agent.md    # Direct, no version folder
+├── prompts/
+│   └── git.prompt.md              # Direct, no version folder
+└── bundles/
+    └── my-bundle/
+        └── v1.0.0/                # Bundles can be versioned
+```
+
+### Bundle System
+
+Bundles combine multiple resources with manifest-based dependency management:
+
+**Bundle Manifest (`bundle.json`):**
+```json
+{
+  "name": "example-bundle",
+  "version": "1.0.0",
+  "dependencies": {
+    "agents": [
+      {
+        "name": "skill-builder",
+        "type": "reference",
+        "source": "agents/skill-builder.agent.md"
+      }
+    ],
+    "prompts": [
+      {
+        "name": "custom",
+        "type": "inline",
+        "path": "prompts/custom.prompt.md"
+      }
+    ]
+  }
+}
+```
+
+**Resource Types:**
+- **reference**: Links to shared resources in custom_copilot
+- **inline**: Bundle-specific resources included in the bundle
 
 ### Tracking System
 
-The tool tracks artifacts in `.github/.cc-tracking.json`:
+The tool tracks artifacts in `.github/.cuco-tracking.json`:
 
 ```json
 {
@@ -238,13 +515,13 @@ The tool tracks artifacts in `.github/.cc-tracking.json`:
 This enables:
 - ✅ Detection of local modifications (by comparing hashes)
 - ✅ Identification of registry-based vs user-created artifacts
-- ✅ Version tracking (future enhancement)
+- ✅ Version tracking
 - ✅ Selective sync operations
 
 ### How It Works
 
 1. **Registry**: Artifacts are bundled with the package in `src/cc/registry/`
-2. **Tracking**: When you `cc add` an artifact, its hash is stored
+2. **Tracking**: When you `cuco add` an artifact, its hash is stored
 3. **Sync Detection**:
    - Compare current file hash with tracked hash → detects local changes
    - Compare tracked hash with registry hash → detects upstream updates
@@ -252,22 +529,103 @@ This enables:
 
 ## 🔧 For Contributors
 
-### Adding New Artifacts to Registry
+### Development Workflow with `.github` and `custom_copilot`
 
-To add a new artifact to the registry:
+The repository uses a clean, flat structure:
 
-1. Place the artifact in `src/cc/registry/<type>/`
-2. For files: `<name>.md`, `<name>.agent.md`, `<name>.prompt.md`
-3. For skills: Create directory `<name>/` with `SKILL.md`
+**`.github/` folder:**
+- For developing and testing new skills, agents, prompts
+- Active development and experimentation
+- Can be used for project-specific customizations
+
+**`custom_copilot/` folder:**
+- Stable resources ready for distribution
+- Flat structure (no version folders)
+- Resources updated in place
+- Bundles can be versioned if needed
+- Templates for creating new resources
+
+**Workflow:**
+1. Develop new skill/agent/prompt in `.github/`
+2. Test and iterate until stable
+3. Promote to `custom_copilot/<type>/`
+4. Use templates to create new resources
+5. Optionally create bundle combining resources
+
+### Adding New Artifacts
+
+To add a new artifact:
+
+1. Use a template from `custom_copilot/templates/`
+2. Place the artifact in `custom_copilot/<type>/`
+3. For files: `<name>.md`, `<name>.agent.md`, `<name>.prompt.md`
+4. For skills: Create directory `<name>/` with `SKILL.md`
 
 Example:
 ```bash
-# Add a new prompt
-cp my-custom-prompt.md src/cc/registry/prompts/
+# Copy template and customize
+cp custom_copilot/templates/prompt-template.prompt.md custom_copilot/prompts/my-prompt.prompt.md
 
-# Add a new skill
-cp -r my-skill/ src/cc/registry/skills/
+# Add a new skill from template
+cp -r custom_copilot/templates/skill-template custom_copilot/skills/my-skill
 ```
+
+### Creating a Bundle
+
+To create a new bundle:
+
+1. Copy template: `custom_copilot/templates/bundle-template/`
+2. Rename to: `custom_copilot/bundles/my-bundle/`
+3. Customize `bundle.json` manifest
+4. Add `copilot-instructions.md` with bundle-specific guidance
+5. Add inline resources in subdirectories (optional)
+6. Reference existing resources
+
+Example `bundle.json`:
+```json
+{
+  "name": "my-bundle",
+  "version": "1.0.0",
+  "description": "My custom bundle",
+  "copilotInstructions": {
+    "type": "inline",
+    "path": "copilot-instructions.md"
+  },
+  "dependencies": {
+    "agents": [
+      {
+        "name": "my-agent",
+        "type": "reference",
+        "source": "agents/my-agent.agent.md"
+      }
+    ],
+    "skills": [
+      {
+        "name": "custom-skill",
+        "type": "inline",
+        "path": "skills/custom-skill"
+      }
+    ]
+  }
+}
+```
+
+### Templates
+
+The `custom_copilot/templates/` folder contains templates for all resource types:
+- `agent-template.agent.md` - Agent template
+- `prompt-template.prompt.md` - Prompt template
+- `skill-template/` - Skill template directory
+- `bundle-template/` - Bundle template directory
+
+Use these as starting points to ensure consistency.
+
+### Legacy Registry (Backward Compatibility)
+
+The `src/cc/registry/` folder remains for backward compatibility:
+- Still used by `cuco add` command
+- Will be deprecated in future versions
+- New resources should go in `custom_copilot/`
 
 ### Extending Commands
 
@@ -311,34 +669,62 @@ pip install -e .
 
 # Test commands
 cd /tmp/test-project
-cc init
-cc add skill test-driven-development
-cc sync
+cuco init
+cuco add skill test-driven-development
+cuco sync
 ```
 
 ## 🔮 Future Enhancements
 
 - [ ] Remote registry support (fetch from GitHub, npm, etc.)
-- [ ] Version pinning and rollback
+- [x] Flat structure for base resources (simplified from versioning)
+- [x] Templates for creating new resources
 - [ ] Three-way merge support for conflicts
 - [ ] Diff visualization for local modifications
 - [ ] Template variables for artifact customization
-- [ ] Artifact dependencies and installation order
+- [x] Artifact dependencies and installation order (via bundles)
 - [ ] Search registry command (with filters and keywords)
 - [ ] Export/share custom artifacts
+- [x] Bundle support for combining customizations
+- [ ] Bundle dependency resolution and validation
+- [ ] Bundle versioning system (when needed)
 
 ## 📝 License
 
-This project is part of the DJ2695/custom-copilot repository.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+Copyright (c) 2026 DJ2695
 
 ## 🤝 Contributing
 
-Contributions are welcome! Feel free to:
-- Add new artifacts to the registry
-- Improve conflict resolution logic
-- Enhance CLI user experience
-- Add new commands
-- Improve documentation
+**Important:** This repository is currently maintained exclusively by [@DJ2695](https://github.com/DJ2695).
+
+At this time, **external contributions are not being accepted**. This includes:
+- Pull requests
+- Feature requests  
+- Bug reports
+
+For more details, please see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+### For Users
+
+If you'd like to customize this tool for your needs:
+- ✅ Fork this repository
+- ✅ Modify it according to the MIT License
+- ✅ Create your own version
+
+### For the Repository Owner
+
+Development workflow:
+```bash
+# Clone and install in editable mode
+git clone https://github.com/DJ2695/custom-copilot.git
+cd custom-copilot
+pip install -e .
+
+# Make changes and test
+cuco help
+```
 
 ---
 

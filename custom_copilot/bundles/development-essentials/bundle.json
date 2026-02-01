@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Essential development bundle with TDD, debugging, and skill creation tools",
   "copilotInstructions": {
-    "type": "inline",
+    "type": "bundle",
     "path": "copilot-instructions.md",
     "description": "Essential development workflow guidance"
   },
@@ -11,7 +11,7 @@
     "agents": [
       {
         "name": "skill-builder",
-        "type": "reference",
+        "type": "custom-copilot",
         "source": "agents/skill-builder.agent.md",
         "description": "Expert in creating and modifying GitHub Copilot skills"
       }
@@ -19,7 +19,7 @@
     "prompts": [
       {
         "name": "git",
-        "type": "reference",
+        "type": "custom-copilot",
         "source": "prompts/git.prompt.md",
         "description": "Git operations and repository management"
       }
@@ -27,25 +27,25 @@
     "skills": [
       {
         "name": "test-driven-development",
-        "type": "reference",
+        "type": "custom-copilot",
         "source": "skills/test-driven-development",
         "description": "TDD workflow enforcement with RED-GREEN-REFACTOR cycle"
       },
       {
         "name": "systematic-debugging",
-        "type": "reference",
+        "type": "custom-copilot",
         "source": "skills/systematic-debugging",
         "description": "Systematic debugging approach for root cause analysis"
       },
       {
         "name": "skill-creator",
-        "type": "reference",
+        "type": "custom-copilot",
         "source": "skills/skill-creator",
         "description": "Create effective GitHub Copilot skills"
       },
       {
         "name": "subagent-driven-development",
-        "type": "reference",
+        "type": "custom-copilot",
         "source": "skills/subagent-driven-development",
         "description": "Execute plans using fresh subagents for each task"
       }

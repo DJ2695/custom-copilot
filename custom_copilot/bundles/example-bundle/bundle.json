@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Example bundle demonstrating the bundle structure with copilot customizations",
   "copilotInstructions": {
-    "type": "inline",
+    "type": "bundle",
     "path": "copilot-instructions.md",
     "description": "Bundle-specific instructions on how to use the agents and skills together"
   },
@@ -11,7 +11,7 @@
     "agents": [
       {
         "name": "skill-builder",
-        "type": "reference",
+        "type": "custom-copilot",
         "source": "agents/skill-builder.agent.md",
         "description": "Expert in creating and modifying GitHub Copilot skills"
       }
@@ -19,13 +19,13 @@
     "prompts": [
       {
         "name": "git",
-        "type": "reference",
+        "type": "custom-copilot",
         "source": "prompts/git.prompt.md",
         "description": "Git operations prompt"
       },
       {
         "name": "custom-prompt",
-        "type": "inline",
+        "type": "bundle",
         "path": "prompts/custom.prompt.md",
         "description": "Bundle-specific custom prompt only relevant in this bundle"
       }
@@ -33,7 +33,7 @@
     "skills": [
       {
         "name": "test-driven-development",
-        "type": "reference",
+        "type": "custom-copilot",
         "source": "skills/test-driven-development",
         "description": "TDD workflow enforcement"
       }

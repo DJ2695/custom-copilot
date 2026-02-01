@@ -8,14 +8,14 @@ the package registry to the project's .github directory.
 import shutil
 from pathlib import Path
 from typing import List
-from cc.utils import (
+from custom_copilot.utils import (
     get_github_dir,
     get_registry_path,
     track_artifact,
     calculate_file_hash,
     calculate_dir_hash
 )
-from cc.commands import mcp
+from custom_copilot.commands import mcp
 
 
 def list_available_artifacts(artifact_type: str) -> List[str]:

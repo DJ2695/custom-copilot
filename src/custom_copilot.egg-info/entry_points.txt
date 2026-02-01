@@ -1,2 +1,2 @@
 [console_scripts]
-cc = cc.cli:main
+cuco = custom_copilot.cli:main

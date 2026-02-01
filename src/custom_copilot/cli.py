@@ -6,7 +6,7 @@ This module provides the main CLI entry point and command routing.
 
 import sys
 from typing import List, Optional
-from cc.commands import init, add, sync, list as list_cmd, bundle
+from custom_copilot.commands import init, add, sync, list as list_cmd, bundle
 
 
 def print_help():
