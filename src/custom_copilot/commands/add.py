@@ -305,7 +305,7 @@ def run(args: List[str]) -> int:
     
     # Check if artifact_name is a GitHub URL
     if artifact_name.startswith("http://") or artifact_name.startswith("https://"):
-        if "github.com" in artifact_name:
+        if "github.com" in artifact_name or "githubusercontent.com" in artifact_name:
             print(f"Detected GitHub URL, fetching {artifact_type_singular}...")
             if add_from_github_url(artifact_name, artifact_type):
                 return 0
