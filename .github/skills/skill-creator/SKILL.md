@@ -7,6 +7,8 @@ description: 'Comprehensive guide for creating effective GitHub Copilot skills t
 
 A comprehensive guide for creating effective skills that extend GitHub Copilot agent capabilities through specialized knowledge, workflows, and tool integrations.
 
+
+
 ## About Skills
 
 Skills are modular, self-contained packages that transform a general-purpose agent into a specialized agent equipped with procedural knowledge and domain expertise. Think of them as "onboarding guides" for specific domains or tasks.
