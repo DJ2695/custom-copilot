@@ -1,7 +1,7 @@
 [project]
 name = "custom-copilot"
-version = "0.1.0"
-description = "Custom Copilot CLI - A tool for managing GitHub Copilot customizations"
+version = "0.2.0"
+description = "Professional CLI tool for managing GitHub Copilot customizations"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = []
