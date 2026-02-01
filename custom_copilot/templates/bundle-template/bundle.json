@@ -1,0 +1,44 @@
+{
+  "name": "bundle-name",
+  "version": "1.0.0",
+  "description": "Brief description of what this bundle provides",
+  "copilotInstructions": {
+    "type": "inline",
+    "path": "copilot-instructions.md",
+    "description": "Instructions on how to use this bundle"
+  },
+  "dependencies": {
+    "agents": [
+      {
+        "name": "agent-name",
+        "type": "reference",
+        "source": "agents/agent-name.agent.md",
+        "description": "Description of why this agent is included"
+      }
+    ],
+    "prompts": [
+      {
+        "name": "prompt-name",
+        "type": "reference",
+        "source": "prompts/prompt-name.prompt.md",
+        "description": "Description of why this prompt is included"
+      }
+    ],
+    "skills": [
+      {
+        "name": "skill-name",
+        "type": "reference",
+        "source": "skills/skill-name",
+        "description": "Description of why this skill is included"
+      }
+    ],
+    "instructions": []
+  },
+  "metadata": {
+    "author": "Your Name",
+    "created": "2026-02-01",
+    "tags": ["tag1", "tag2"],
+    "compatibleCopilotVersions": ["*"],
+    "recommendedFor": ["use-case-1", "use-case-2"]
+  }
+}

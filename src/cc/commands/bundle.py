@@ -19,13 +19,13 @@ from cc.utils import (
 
 def get_customizations_path() -> Path:
     """
-    Get the path to the copilot-customizations directory.
+    Get the path to the custom_copilot directory.
     
     Returns:
-        Path to copilot-customizations directory in the package
+        Path to custom_copilot directory in the package
     """
     package_dir = Path(__file__).parent.parent
-    return package_dir.parent.parent / "copilot-customizations"
+    return package_dir.parent.parent / "custom_copilot"
 
 
 def list_available_bundles() -> List[str]:
