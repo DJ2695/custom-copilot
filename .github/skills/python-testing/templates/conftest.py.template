@@ -1,0 +1,213 @@
+"""
+Shared pytest configuration and fixtures.
+
+This file is automatically discovered by pytest and provides
+shared fixtures, configuration, and hooks for all tests.
+"""
+import pytest
+from unittest.mock import Mock
+
+
+def pytest_configure(config):
+    """Register custom markers."""
+    config.addinivalue_line(
+        "markers",
+        "unit: Unit tests (fast, isolated, all dependencies mocked)"
+    )
+    config.addinivalue_line(
+        "markers",
+        "integration: Integration tests (slower, real dependencies)"
+    )
+    config.addinivalue_line(
+        "markers",
+        "slow: Slow-running tests (may take several seconds)"
+    )
+    config.addinivalue_line(
+        "markers",
+        "security: Security-related tests (authentication, authorization, etc.)"
+    )
+    config.addinivalue_line(
+        "markers",
+        "smoke: Smoke tests for critical functionality"
+    )
+
+
+def pytest_addoption(parser):
+    """Add custom command-line options."""
+    parser.addoption(
+        "--integration",
+        action="store_true",
+        default=False,
+        help="run integration tests (disabled by default)"
+    )
+    parser.addoption(
+        "--slow",
+        action="store_true",
+        default=False,
+        help="run slow tests (disabled by default)"
+    )
+
+
+def pytest_collection_modifyitems(config, items):
+    """Skip tests based on command-line options."""
+    # Skip integration tests unless --integration flag is provided
+    if not config.getoption("--integration"):
+        skip_integration = pytest.mark.skip(reason="need --integration flag to run")
+        for item in items:
+            if "integration" in item.keywords:
+                item.add_marker(skip_integration)
+    
+    # Skip slow tests unless --slow flag is provided
+    if not config.getoption("--slow"):
+        skip_slow = pytest.mark.skip(reason="need --slow flag to run")
+        for item in items:
+            if "slow" in item.keywords:
+                item.add_marker(skip_slow)
+
+
+# ============================================================================
+# Common Fixtures
+# ============================================================================
+
+@pytest.fixture
+def mock_firestore_client():
+    """Mock Firestore client for testing."""
+    mock = Mock()
+    mock.collection.return_value = Mock()
+    mock.collection().document.return_value = Mock()
+    return mock
+
+
+@pytest.fixture
+def test_user_id():
+    """Standard test user ID for consistency across tests."""
+    return "test-user-123"
+
+
+@pytest.fixture
+def test_admin_id():
+    """Standard test admin user ID."""
+    return "test-admin-456"
+
+
+@pytest.fixture
+def sample_user_data():
+    """Sample user data for tests."""
+    return {
+        "id": "user-123",
+        "email": "test@example.com",
+        "name": "Test User",
+        "created_at": "2024-01-01T00:00:00Z",
+        "updated_at": "2024-01-01T00:00:00Z",
+        "is_active": True
+    }
+
+
+@pytest.fixture
+def sample_document_data():
+    """Sample document data for tests."""
+    return {
+        "id": "doc-123",
+        "user_id": "test-user-123",
+        "title": "Test Document",
+        "content": "Test content",
+        "created_at": "2024-01-01T00:00:00Z",
+        "updated_at": "2024-01-01T00:00:00Z",
+    }
+
+
+@pytest.fixture
+def mock_auth_context():
+    """Mock authentication context."""
+    context = Mock()
+    context.uid = "test-user-123"
+    context.token = {
+        "email": "test@example.com",
+        "email_verified": True
+    }
+    return context
+
+
+@pytest.fixture
+def mock_datetime(monkeypatch):
+    """Mock datetime to return consistent timestamps."""
+    from datetime import datetime
+    
+    class MockDatetime:
+        @staticmethod
+        def utcnow():
+            return datetime(2024, 1, 1, 0, 0, 0)
+    
+    monkeypatch.setattr("datetime.datetime", MockDatetime)
+    return MockDatetime
+
+
+# ============================================================================
+# Test Data Factories
+# ============================================================================
+
+@pytest.fixture
+def user_factory():
+    """Factory for creating test user objects."""
+    def _create_user(**kwargs):
+        defaults = {
+            "id": "user-123",
+            "email": "test@example.com",
+            "name": "Test User",
+            "created_at": "2024-01-01T00:00:00Z",
+            "is_active": True
+        }
+        defaults.update(kwargs)
+        return defaults
+    return _create_user
+
+
+@pytest.fixture
+def document_factory():
+    """Factory for creating test document objects."""
+    def _create_document(**kwargs):
+        defaults = {
+            "id": "doc-123",
+            "user_id": "test-user-123",
+            "title": "Test Document",
+            "content": "Test content",
+            "created_at": "2024-01-01T00:00:00Z"
+        }
+        defaults.update(kwargs)
+        return defaults
+    return _create_document
+
+
+# ============================================================================
+# Cleanup Fixtures
+# ============================================================================
+
+@pytest.fixture(autouse=True)
+def reset_mocks():
+    """Automatically reset all mocks after each test."""
+    yield
+    # Cleanup happens here if needed
+
+
+@pytest.fixture(scope="function")
+def isolated_test():
+    """Ensure complete test isolation."""
+    # Setup
+    yield
+    # Teardown
+    pass
+
+
+# ============================================================================
+# Reporting Hooks
+# ============================================================================
+
+@pytest.hookimpl(tryfirst=True, hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    """Add custom information to test reports."""
+    outcome = yield
+    report = outcome.get_result()
+    
+    # Add test markers to report
+    if report.when == "call":
+        report.markers = [marker.name for marker in item.iter_markers()]

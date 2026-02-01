@@ -1,0 +1,169 @@
+"""
+Repository tests for ${RepositoryName}.
+
+Repositories handle data access and persistence logic.
+Mock database clients to keep tests fast and isolated.
+"""
+import pytest
+from unittest.mock import Mock, patch
+
+from repositories.${repository_module} import ${RepositoryName}
+from models.${model_module} import ${ModelName}
+
+
+class Test${RepositoryName}:
+    """Test suite for ${RepositoryName}."""
+
+    @pytest.fixture
+    def mock_db_client(self):
+        """Mock database client."""
+        mock = Mock()
+        return mock
+
+    @pytest.fixture
+    def repository(self, mock_db_client):
+        """Create repository with mocked database."""
+        return ${RepositoryName}(db_client=mock_db_client)
+
+    def test_get_by_id_success(self, repository, mock_db_client):
+        """Test retrieving entity by ID returns correct data."""
+        # Arrange
+        expected_data = {
+            "id": "123",
+            "name": "Test Entity",
+            "created_at": "2024-01-01T00:00:00Z"
+        }
+        mock_db_client.collection().document().get.return_value.to_dict.return_value = expected_data
+        mock_db_client.collection().document().get.return_value.exists = True
+
+        # Act
+        result = repository.get_by_id("123")
+
+        # Assert
+        assert result["id"] == "123"
+        assert result["name"] == "Test Entity"
+        mock_db_client.collection().document.assert_called_once_with("123")
+
+    def test_get_by_id_not_found(self, repository, mock_db_client):
+        """Test get_by_id returns None when entity doesn't exist."""
+        # Arrange
+        mock_db_client.collection().document().get.return_value.exists = False
+
+        # Act
+        result = repository.get_by_id("nonexistent")
+
+        # Assert
+        assert result is None
+
+    def test_create_success(self, repository, mock_db_client):
+        """Test creating new entity returns generated ID."""
+        # Arrange
+        entity_data = {
+            "name": "Test Entity",
+            "email": "test@example.com"
+        }
+        mock_doc_ref = Mock()
+        mock_doc_ref.id = "new-123"
+        mock_db_client.collection().add.return_value = (None, mock_doc_ref)
+
+        # Act
+        result = repository.create(entity_data)
+
+        # Assert
+        assert result == "new-123"
+        mock_db_client.collection().add.assert_called_once()
+        call_args = mock_db_client.collection().add.call_args[0][0]
+        assert call_args["name"] == "Test Entity"
+        assert "created_at" in call_args  # Timestamp should be added
+
+    def test_update_success(self, repository, mock_db_client):
+        """Test updating existing entity."""
+        # Arrange
+        entity_id = "123"
+        update_data = {"name": "Updated Name"}
+        mock_db_client.collection().document().get.return_value.exists = True
+
+        # Act
+        repository.update(entity_id, update_data)
+
+        # Assert
+        mock_db_client.collection().document().update.assert_called_once()
+        call_args = mock_db_client.collection().document().update.call_args[0][0]
+        assert call_args["name"] == "Updated Name"
+        assert "updated_at" in call_args  # Timestamp should be updated
+
+    def test_update_not_found(self, repository, mock_db_client):
+        """Test update raises error when entity doesn't exist."""
+        # Arrange
+        mock_db_client.collection().document().get.return_value.exists = False
+
+        # Act & Assert
+        with pytest.raises(ValueError) as exc_info:
+            repository.update("nonexistent", {"name": "New"})
+        
+        assert "not found" in str(exc_info.value).lower()
+
+    def test_delete_success(self, repository, mock_db_client):
+        """Test deleting entity."""
+        # Arrange
+        entity_id = "123"
+        mock_db_client.collection().document().get.return_value.exists = True
+
+        # Act
+        repository.delete(entity_id)
+
+        # Assert
+        mock_db_client.collection().document().delete.assert_called_once()
+
+    def test_list_with_filters(self, repository, mock_db_client):
+        """Test listing entities with query filters."""
+        # Arrange
+        mock_docs = [
+            Mock(id="1", to_dict=lambda: {"id": "1", "name": "Entity 1"}),
+            Mock(id="2", to_dict=lambda: {"id": "2", "name": "Entity 2"})
+        ]
+        mock_db_client.collection().where().stream.return_value = mock_docs
+
+        # Act
+        results = repository.list(filters={"status": "active"})
+
+        # Assert
+        assert len(results) == 2
+        assert results[0]["id"] == "1"
+        mock_db_client.collection().where.assert_called_once_with(
+            "status", "==", "active"
+        )
+
+    def test_count_returns_correct_total(self, repository, mock_db_client):
+        """Test count returns correct number of entities."""
+        # Arrange
+        mock_docs = [Mock(), Mock(), Mock()]
+        mock_db_client.collection().stream.return_value = mock_docs
+
+        # Act
+        count = repository.count()
+
+        # Assert
+        assert count == 3
+
+    def test_exists_returns_true_when_found(self, repository, mock_db_client):
+        """Test exists returns True when entity exists."""
+        # Arrange
+        mock_db_client.collection().document().get.return_value.exists = True
+
+        # Act
+        result = repository.exists("123")
+
+        # Assert
+        assert result is True
+
+    def test_exists_returns_false_when_not_found(self, repository, mock_db_client):
+        """Test exists returns False when entity doesn't exist."""
+        # Arrange
+        mock_db_client.collection().document().get.return_value.exists = False
+
+        # Act
+        result = repository.exists("nonexistent")
+
+        # Assert
+        assert result is False

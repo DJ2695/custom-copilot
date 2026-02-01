@@ -1,0 +1,66 @@
+"""
+Unit tests for ${module_name}.
+
+Tests should be fast, isolated, and test a single unit of functionality.
+All external dependencies should be mocked.
+"""
+import pytest
+from unittest.mock import Mock, patch
+
+from ${module_path} import ${ClassName}
+
+
+class Test${ClassName}:
+    """Test suite for ${ClassName}."""
+
+    @pytest.fixture
+    def subject(self):
+        """Create instance under test."""
+        return ${ClassName}()
+
+    def test_${method_name}_success(self, subject):
+        """Test ${method_name} with valid input returns expected result."""
+        # Arrange
+        input_value = "valid_input"
+        expected_value = "expected_output"
+
+        # Act
+        result = subject.${method_name}(input_value)
+
+        # Assert
+        assert result == expected_value
+
+    def test_${method_name}_with_invalid_input(self, subject):
+        """Test ${method_name} raises ValueError for invalid input."""
+        # Arrange
+        invalid_input = None
+
+        # Act & Assert
+        with pytest.raises(ValueError) as exc_info:
+            subject.${method_name}(invalid_input)
+        
+        assert "expected error message" in str(exc_info.value)
+
+    def test_${method_name}_handles_edge_case(self, subject):
+        """Test ${method_name} handles edge case correctly."""
+        # Arrange
+        edge_case_input = ""
+
+        # Act
+        result = subject.${method_name}(edge_case_input)
+
+        # Assert
+        assert result == expected_edge_case_result
+
+    @patch('${module_path}.external_dependency')
+    def test_${method_name}_with_mocked_dependency(self, mock_dependency, subject):
+        """Test ${method_name} with mocked external dependency."""
+        # Arrange
+        mock_dependency.return_value = "mocked_value"
+
+        # Act
+        result = subject.${method_name}()
+
+        # Assert
+        assert result == "expected_result"
+        mock_dependency.assert_called_once()

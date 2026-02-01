@@ -1,0 +1,192 @@
+"""
+Firebase Cloud Function tests for ${function_name}.
+
+Tests for Firebase callable and triggered functions.
+Verify authentication, input validation, and business logic.
+"""
+import pytest
+from unittest.mock import Mock, patch
+from firebase_functions import https_fn
+
+from functions.${function_module} import ${function_name}
+
+
+class Test${FunctionName}:
+    """Test suite for ${function_name}."""
+
+    @pytest.fixture
+    def mock_auth_request(self):
+        """Request with authenticated user."""
+        req = Mock(spec=https_fn.CallableRequest)
+        req.auth = Mock()
+        req.auth.uid = "test-user-123"
+        req.auth.token = {
+            "email": "test@example.com",
+            "email_verified": True
+        }
+        req.data = {
+            "param": "value"
+        }
+        return req
+
+    @pytest.fixture
+    def mock_unauth_request(self):
+        """Request without authentication."""
+        req = Mock(spec=https_fn.CallableRequest)
+        req.auth = None
+        req.data = {}
+        return req
+
+    @pytest.fixture
+    def mock_admin_request(self):
+        """Request with admin user."""
+        req = Mock(spec=https_fn.CallableRequest)
+        req.auth = Mock()
+        req.auth.uid = "admin-user-123"
+        req.auth.token = {
+            "email": "admin@example.com",
+            "admin": True
+        }
+        req.data = {}
+        return req
+
+    @pytest.mark.security
+    def test_requires_authentication(self, mock_unauth_request):
+        """Test function requires authentication."""
+        # Act & Assert
+        with pytest.raises(https_fn.HttpsError) as exc_info:
+            ${function_name}(mock_unauth_request)
+        
+        assert exc_info.value.code == "unauthenticated"
+        assert "authenticated" in exc_info.value.message.lower()
+
+    def test_validates_required_input(self, mock_auth_request):
+        """Test function validates required input parameters."""
+        # Arrange - Remove required parameter
+        mock_auth_request.data = {}
+
+        # Act & Assert
+        with pytest.raises(https_fn.HttpsError) as exc_info:
+            ${function_name}(mock_auth_request)
+        
+        assert exc_info.value.code == "invalid-argument"
+        assert "required" in exc_info.value.message.lower()
+
+    def test_validates_input_types(self, mock_auth_request):
+        """Test function validates input parameter types."""
+        # Arrange - Wrong type for parameter
+        mock_auth_request.data = {
+            "param": 123  # Should be string
+        }
+
+        # Act & Assert
+        with pytest.raises(https_fn.HttpsError) as exc_info:
+            ${function_name}(mock_auth_request)
+        
+        assert exc_info.value.code == "invalid-argument"
+
+    @patch('functions.${function_module}.${ServiceClass}')
+    def test_success_path(self, mock_service_class, mock_auth_request):
+        """Test successful function execution."""
+        # Arrange
+        mock_service = Mock()
+        mock_service.process.return_value = {
+            "result": "success",
+            "data": {"id": "123"}
+        }
+        mock_service_class.return_value = mock_service
+
+        # Act
+        result = ${function_name}(mock_auth_request)
+
+        # Assert
+        assert result["success"] is True
+        assert result["data"]["id"] == "123"
+        mock_service.process.assert_called_once()
+
+    @patch('functions.${function_module}.${ServiceClass}')
+    def test_handles_service_error(self, mock_service_class, mock_auth_request):
+        """Test function handles service layer errors."""
+        # Arrange
+        mock_service = Mock()
+        mock_service.process.side_effect = ValueError("Service error")
+        mock_service_class.return_value = mock_service
+
+        # Act & Assert
+        with pytest.raises(https_fn.HttpsError) as exc_info:
+            ${function_name}(mock_auth_request)
+        
+        assert exc_info.value.code == "internal"
+
+    @pytest.mark.security
+    def test_validates_user_permissions(self, mock_auth_request):
+        """Test function validates user has required permissions."""
+        # Arrange - User doesn't own the resource
+        mock_auth_request.data = {
+            "user_id": "other-user-456"
+        }
+
+        # Act & Assert
+        with pytest.raises(https_fn.HttpsError) as exc_info:
+            ${function_name}(mock_auth_request)
+        
+        assert exc_info.value.code == "permission-denied"
+
+    @pytest.mark.security
+    @patch('functions.${function_module}.verify_admin')
+    def test_admin_only_operation(self, mock_verify_admin, mock_auth_request):
+        """Test function requires admin privileges for certain operations."""
+        # Arrange
+        mock_verify_admin.return_value = False
+
+        # Act & Assert
+        with pytest.raises(https_fn.HttpsError) as exc_info:
+            ${function_name}(mock_auth_request)
+        
+        assert exc_info.value.code == "permission-denied"
+        assert "admin" in exc_info.value.message.lower()
+
+    @patch('functions.${function_module}.firestore.client')
+    def test_database_interaction(self, mock_firestore, mock_auth_request):
+        """Test function interacts correctly with database."""
+        # Arrange
+        mock_doc = Mock()
+        mock_doc.exists = True
+        mock_doc.to_dict.return_value = {
+            "id": "doc-123",
+            "data": "test"
+        }
+        mock_firestore.return_value.collection().document().get.return_value = mock_doc
+
+        # Act
+        result = ${function_name}(mock_auth_request)
+
+        # Assert
+        assert result is not None
+        mock_firestore.return_value.collection.assert_called()
+
+    def test_returns_expected_structure(self, mock_auth_request):
+        """Test function returns data in expected structure."""
+        # Act
+        result = ${function_name}(mock_auth_request)
+
+        # Assert
+        assert isinstance(result, dict)
+        assert "success" in result
+        assert "data" in result or "message" in result
+
+    @pytest.mark.slow
+    @patch('functions.${function_module}.${ServiceClass}')
+    def test_handles_timeout(self, mock_service_class, mock_auth_request):
+        """Test function handles timeout scenarios."""
+        # Arrange
+        import time
+        mock_service = Mock()
+        mock_service.process.side_effect = lambda: time.sleep(2)
+        mock_service_class.return_value = mock_service
+
+        # Act & Assert
+        with pytest.raises(https_fn.HttpsError) as exc_info:
+            ${function_name}(mock_auth_request)
+        
+        assert exc_info.value.code in ["deadline-exceeded", "internal"]
