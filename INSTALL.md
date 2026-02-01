@@ -1,6 +1,6 @@
 # Installation Guide
 
-This guide covers all methods for installing the Custom Copilot CLI (`cc`) using both `pip` and `uv`.
+This guide covers all methods for installing the Custom Copilot CLI (`cuco`) using both `pip` and `uv`.
 
 ## Prerequisites
 
@@ -71,7 +71,7 @@ uv add git+https://github.com/DJ2695/custom-copilot.git
 uv add --dev git+https://github.com/DJ2695/custom-copilot.git
 
 # Then run commands in your project context
-uv run cc help
+uv run cuco help
 ```
 
 ### 2. Install from Private Repository
@@ -205,7 +205,7 @@ cd custom-copilot
 uv sync
 
 # This creates a virtual environment and installs the package in editable mode
-# Run commands with: uv run cc help
+# Run commands with: uv run cuco help
 
 # Method 2: Install in editable mode with uv pip
 uv pip install -e .
@@ -248,18 +248,18 @@ After installation, verify the CLI is working:
 
 ```bash
 # If installed globally (pip or uv tool)
-cc help
+cuco help
 
 # If installed in a project with uv
-uv run cc help
+uv run cuco help
 
 # Verify Python can import the package
 python -c "import cc; print(cc.__version__)"
 
 # Test basic functionality
 cd /tmp/test-project
-cc init
-cc list skills
+cuco init
+cuco list skills
 ```
 
 ## Upgrading
@@ -320,7 +320,7 @@ uv remove copilot
 
 ## Troubleshooting
 
-### Issue: "command not found: cc"
+### Issue: "command not found: cuco"
 
 **Solution for pip:** The script directory might not be in your PATH.
 
@@ -337,7 +337,7 @@ python -m cc help
 
 **Solution for uv:** 
 - If installed with `uv tool install`, the command should automatically be in PATH
-- If installed in a project, use `uv run cc help`
+- If installed in a project, use `uv run cuco help`
 - Check uv's tool directory: `uv tool dir`
 
 ### Issue: Authentication failed for private repository
@@ -421,7 +421,7 @@ CMD ["cc", "help"]
 
 After successful installation:
 1. Read the [README.md](README.md) for usage examples
-2. Try `cc init` in a project directory
-3. Explore available artifacts with `cc list skills`
+2. Try `cuco init` in a project directory
+3. Explore available artifacts with `cuco list skills`
 
 For issues or questions, refer to [CONTRIBUTING.md](CONTRIBUTING.md).

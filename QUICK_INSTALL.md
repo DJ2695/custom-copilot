@@ -24,7 +24,7 @@ cd /path/to/your/project
 uv add --dev git+https://github.com/DJ2695/custom-copilot.git
 
 # Then use with:
-uv run cc help
+uv run cuco help
 ```
 
 ### Private Repository - SSH
@@ -93,19 +93,19 @@ cd custom-copilot
 uv sync
 
 # Then run commands with:
-uv run cc help
+uv run cuco help
 ```
 
 ## Verify Installation
 
 ### If installed globally
 ```bash
-cc help
+cuco help
 ```
 
 ### If installed in project with uv
 ```bash
-uv run cc help
+uv run cuco help
 ```
 
 ## UV vs PIP: When to Use Which?
@@ -120,7 +120,7 @@ uv run cc help
 - ✅ You want different versions per project
 - ✅ You want to track dependencies in pyproject.toml
 - ✅ You're working in a team and want reproducible environments
-- ✅ You want to use `uv run cc` to ensure correct version
+- ✅ You want to use `uv run cuco` to ensure correct version
 
 ### Use `pip install` When:
 - ✅ You don't have uv installed
@@ -137,7 +137,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 uv tool install git+https://github.com/DJ2695/custom-copilot.git
 
 # Use it anywhere
-cc help
+cuco help
 ```
 
 ## Making the Repository Public
