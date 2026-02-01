@@ -168,6 +168,7 @@ cuco list skills
 cuco list prompts
 cuco list agents
 cuco list mcps
+cuco list bundles
 ```
 
 ### Add Artifacts
@@ -188,6 +189,24 @@ cuco add skill test-driven-development
 # Add an MCP server (automatically handles .env setup)
 cuco add mcp context7
 ```
+
+### Working with Bundles
+
+Bundles are pre-configured combinations of copilot customizations that work together:
+
+```bash
+# List available bundles
+cuco bundle list
+cuco list bundles
+
+# Install a bundle (includes all dependencies)
+cuco bundle add example-bundle
+```
+
+A bundle automatically installs:
+- Copilot instructions (bundle-specific guidance)
+- Referenced agents, prompts, skills (from versioned registry)
+- Inline resources (bundle-specific customizations)
 
 ### Sync Artifacts
 
@@ -263,6 +282,7 @@ cuco list prompts
 cuco list instructions
 cuco list skills
 cuco list mcps
+cuco list bundles
 ```
 
 **Examples:**
@@ -282,11 +302,53 @@ cuco list mcps
 #   - serena
 #   - sequential-thinking
 #   ...
+
+cuco list bundles
+# Output:
+# Available bundles:
+#   - example-bundle (v1.0.0)
+#     Example bundle demonstrating the bundle structure
 ```
 
 **What it does:**
 - Shows all available artifacts of the specified type from the registry
 - Helps you discover what's available before adding
+
+### `cuco bundle <operation> [args]`
+
+Manage bundles - pre-configured combinations of copilot customizations.
+
+**Usage:**
+```bash
+cuco bundle list              # List available bundles
+cuco bundle add <name>        # Install a bundle
+```
+
+**Examples:**
+```bash
+cuco bundle list
+# Output:
+# Available bundles:
+#   - example-bundle (v1.0.0)
+#     Example bundle demonstrating the bundle structure
+
+cuco bundle add example-bundle
+# Installs:
+#   - copilot-instructions.md (bundle-specific guidance)
+#   - Referenced agents (from versioned registry)
+#   - Referenced prompts (from versioned registry)
+#   - Referenced skills (from versioned registry)
+#   - Inline resources (bundle-specific customizations)
+```
+
+**What it does:**
+- **list**: Shows all available bundles with versions and descriptions
+- **add**: Installs a bundle with all its dependencies:
+  - Copies copilot-instructions.md (if included)
+  - Installs referenced resources from versioned registry
+  - Installs inline resources specific to the bundle
+  - Ensures all dependencies are available
+- Prompts for confirmation when overwriting existing files
 
 ### `cuco sync [artifact-name]`
 
@@ -329,13 +391,84 @@ src/cc/
 │   ├── __init__.py
 │   ├── init.py          # cuco init command
 │   ├── add.py           # cuco add command
+│   ├── bundle.py        # cuco bundle command
 │   └── sync.py          # cuco sync command
-└── registry/             # Bundled artifacts
+└── registry/             # Bundled artifacts (legacy)
     ├── agents/
     ├── prompts/
     ├── instructions/
     └── skills/
+
+copilot-customizations/   # Versioned customizations
+├── agents/
+│   ├── latest/          # Latest version
+│   └── v1/              # Version 1
+├── prompts/
+│   ├── latest/
+│   └── v1/
+├── skills/
+│   └── latest/
+├── instructions/
+│   └── latest/
+└── bundles/             # Pre-configured bundles
+    └── example-bundle/
+        ├── bundle.json
+        ├── copilot-instructions.md
+        ├── agents/      # Bundle-specific agents
+        ├── prompts/     # Bundle-specific prompts
+        └── skills/      # Bundle-specific skills
 ```
+
+### Versioning Strategy
+
+Resources in `copilot-customizations/` support versioning:
+
+- **`latest/`**: Current stable version (default)
+- **`v1/`, `v2/`, etc.**: Specific versions for compatibility
+- Bundles can reference specific versions
+- Supports gradual migration to new versions
+
+**Example:**
+```
+agents/
+├── latest/
+│   └── planner.agent.md    # Current version
+└── v1/
+    └── planner.agent.md    # Old version for legacy support
+```
+
+### Bundle System
+
+Bundles combine multiple resources with manifest-based dependency management:
+
+**Bundle Manifest (`bundle.json`):**
+```json
+{
+  "name": "example-bundle",
+  "version": "1.0.0",
+  "dependencies": {
+    "agents": [
+      {
+        "name": "skill-builder",
+        "type": "reference",
+        "source": "agents/latest/skill-builder.agent.md",
+        "version": "latest"
+      }
+    ],
+    "prompts": [
+      {
+        "name": "custom",
+        "type": "inline",
+        "path": "prompts/custom.prompt.md"
+      }
+    ]
+  }
+}
+```
+
+**Resource Types:**
+- **reference**: Links to versioned resources in copilot-customizations
+- **inline**: Bundle-specific resources included in the bundle
 
 ### Tracking System
 
@@ -358,7 +491,7 @@ The tool tracks artifacts in `.github/.cuco-tracking.json`:
 This enables:
 - ✅ Detection of local modifications (by comparing hashes)
 - ✅ Identification of registry-based vs user-created artifacts
-- ✅ Version tracking (future enhancement)
+- ✅ Version tracking
 - ✅ Selective sync operations
 
 ### How It Works
@@ -372,22 +505,96 @@ This enables:
 
 ## 🔧 For Contributors
 
-### Adding New Artifacts to Registry
+### Development Workflow with `.github` and `copilot-customizations`
 
-To add a new artifact to the registry:
+The repository now supports a dual-folder structure:
 
-1. Place the artifact in `src/cc/registry/<type>/`
+**`.github/` folder:**
+- For developing and testing new skills, agents, prompts
+- Active development and experimentation
+- Not versioned in copilot-customizations
+- Can be used for project-specific customizations
+
+**`copilot-customizations/` folder:**
+- Stable, versioned resources
+- Ready for distribution
+- Supports version history (v1, v2, latest)
+- Organized into bundles
+
+**Workflow:**
+1. Develop new skill/agent/prompt in `.github/`
+2. Test and iterate until stable
+3. Promote to `copilot-customizations/latest/`
+4. Create versioned copy if needed (v1, v2)
+5. Optionally create bundle combining resources
+
+### Adding New Artifacts to Customizations
+
+To add a new versioned artifact:
+
+1. Place the artifact in `copilot-customizations/<type>/latest/`
 2. For files: `<name>.md`, `<name>.agent.md`, `<name>.prompt.md`
 3. For skills: Create directory `<name>/` with `SKILL.md`
+4. Create versioned copies in `v1/`, `v2/` as needed
 
 Example:
 ```bash
-# Add a new prompt
-cp my-custom-prompt.md src/cc/registry/prompts/
+# Add a new prompt (latest version)
+cp my-custom-prompt.md copilot-customizations/prompts/latest/
+
+# Create v1 for compatibility
+cp my-custom-prompt.md copilot-customizations/prompts/v1/
 
 # Add a new skill
-cp -r my-skill/ src/cc/registry/skills/
+cp -r my-skill/ copilot-customizations/skills/latest/
 ```
+
+### Creating a Bundle
+
+To create a new bundle:
+
+1. Create bundle directory: `copilot-customizations/bundles/my-bundle/`
+2. Create `bundle.json` manifest
+3. Add `copilot-instructions.md` with bundle-specific guidance
+4. Add inline resources in subdirectories (optional)
+5. Reference existing versioned resources
+
+Example `bundle.json`:
+```json
+{
+  "name": "my-bundle",
+  "version": "1.0.0",
+  "description": "My custom bundle",
+  "copilotInstructions": {
+    "type": "inline",
+    "path": "copilot-instructions.md"
+  },
+  "dependencies": {
+    "agents": [
+      {
+        "name": "my-agent",
+        "type": "reference",
+        "source": "agents/latest/my-agent.agent.md",
+        "version": "latest"
+      }
+    ],
+    "skills": [
+      {
+        "name": "custom-skill",
+        "type": "inline",
+        "path": "skills/custom-skill"
+      }
+    ]
+  }
+}
+```
+
+### Legacy Registry (Backward Compatibility)
+
+The `src/cc/registry/` folder remains for backward compatibility:
+- Still used by `cuco add` command
+- Will be deprecated in future versions
+- Migrate new resources to `copilot-customizations/`
 
 ### Extending Commands
 
@@ -439,13 +646,16 @@ cuco sync
 ## 🔮 Future Enhancements
 
 - [ ] Remote registry support (fetch from GitHub, npm, etc.)
-- [ ] Version pinning and rollback
+- [x] Version pinning and rollback (via versioned customizations)
 - [ ] Three-way merge support for conflicts
 - [ ] Diff visualization for local modifications
 - [ ] Template variables for artifact customization
-- [ ] Artifact dependencies and installation order
+- [x] Artifact dependencies and installation order (via bundles)
 - [ ] Search registry command (with filters and keywords)
 - [ ] Export/share custom artifacts
+- [x] Bundle support for combining customizations
+- [ ] Bundle dependency resolution and validation
+- [ ] Automated migration from registry to copilot-customizations
 
 ## 📝 License
 

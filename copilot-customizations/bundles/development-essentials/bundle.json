@@ -1,0 +1,68 @@
+{
+  "name": "development-essentials",
+  "version": "1.0.0",
+  "description": "Essential development bundle with TDD, debugging, and skill creation tools",
+  "copilotInstructions": {
+    "type": "inline",
+    "path": "copilot-instructions.md",
+    "description": "Essential development workflow guidance"
+  },
+  "dependencies": {
+    "agents": [
+      {
+        "name": "skill-builder",
+        "type": "reference",
+        "source": "agents/latest/skill-builder.agent.md",
+        "version": "latest",
+        "description": "Expert in creating and modifying GitHub Copilot skills"
+      }
+    ],
+    "prompts": [
+      {
+        "name": "git",
+        "type": "reference",
+        "source": "prompts/latest/git.prompt.md",
+        "version": "latest",
+        "description": "Git operations and repository management"
+      }
+    ],
+    "skills": [
+      {
+        "name": "test-driven-development",
+        "type": "reference",
+        "source": "skills/latest/test-driven-development",
+        "version": "latest",
+        "description": "TDD workflow enforcement with RED-GREEN-REFACTOR cycle"
+      },
+      {
+        "name": "systematic-debugging",
+        "type": "reference",
+        "source": "skills/latest/systematic-debugging",
+        "version": "latest",
+        "description": "Systematic debugging approach for root cause analysis"
+      },
+      {
+        "name": "skill-creator",
+        "type": "reference",
+        "source": "skills/latest/skill-creator",
+        "version": "latest",
+        "description": "Create effective GitHub Copilot skills"
+      },
+      {
+        "name": "subagent-driven-development",
+        "type": "reference",
+        "source": "skills/latest/subagent-driven-development",
+        "version": "latest",
+        "description": "Execute plans using fresh subagents for each task"
+      }
+    ],
+    "instructions": []
+  },
+  "metadata": {
+    "author": "DJ2695",
+    "created": "2026-02-01",
+    "tags": ["development", "essentials", "tdd", "debugging"],
+    "compatibleCopilotVersions": ["*"],
+    "recommendedFor": ["software-development", "agile-teams", "tdd-practitioners"]
+  }
+}
