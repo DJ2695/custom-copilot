@@ -1,18 +1,18 @@
 """
-Command-line interface for the cc tool.
+Command-line interface for custom-copilot.
 
 This module provides the main CLI entry point and command routing.
 """
 
 import sys
 from typing import List, Optional
-from custom_copilot.commands import init, add, sync, list as list_cmd, bundle
+from custom_copilot.commands import init, add, sync, list as list_cmd, bundle, source
 
 
 def print_help():
     """Print CLI help message."""
     help_text = """
-Custom Copilot CLI (cuco) - Manage GitHub Copilot artifacts
+Custom Copilot CLI (cuco) - Manage GitHub Copilot Customizations
 
 Usage:
     cuco init                                  Initialize .github folder structure
@@ -23,6 +23,9 @@ Usage:
     cuco add mcp <name>                        Add an MCP server from registry
     cuco bundle list                           List available bundles
     cuco bundle add <name>                     Install a bundle
+    cuco source list                           List custom sources
+    cuco source add <name> <type> <url>        Add a custom source repository
+    cuco source remove <name>                  Remove a custom source
     cuco list <type>                           List available artifacts in registry
     cuco sync                                  Sync all artifacts from registry
     cuco sync <artifact-name>                  Sync specific artifact from registry
@@ -32,13 +35,10 @@ Examples:
     cuco init
     cuco add agent skill-builder
     cuco add skill test-driven-development
-    cuco add mcp context7
-    cuco bundle list
-    cuco bundle add example-bundle
-    cuco list skills
-    cuco list mcps
-    cuco sync
-    cuco sync skill-builder
+    cuco bundle add development-essentials
+    cuco source add company git https://github.com/mycompany/copilot-customs.git
+    cuco source list
+    cuco list bundles
 
 For more information, visit: https://github.com/DJ2695/custom-copilot
 """
@@ -75,6 +75,8 @@ def main(args: Optional[List[str]] = None) -> int:
             return list_cmd.run(args[1:])
         elif command == "bundle":
             return bundle.run(args[1:])
+        elif command == "source":
+            return source.run(args[1:])
         else:
             print(f"Error: Unknown command '{command}'")
             print("Run 'cuco help' for usage information.")

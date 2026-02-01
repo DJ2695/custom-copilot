@@ -4,6 +4,7 @@ pyproject.toml
 src/custom_copilot/__init__.py
 src/custom_copilot/__main__.py
 src/custom_copilot/cli.py
+src/custom_copilot/config.py
 src/custom_copilot/utils.py
 src/custom_copilot.egg-info/PKG-INFO
 src/custom_copilot.egg-info/SOURCES.txt
@@ -17,6 +18,7 @@ src/custom_copilot/commands/bundle.py
 src/custom_copilot/commands/init.py
 src/custom_copilot/commands/list.py
 src/custom_copilot/commands/mcp.py
+src/custom_copilot/commands/source.py
 src/custom_copilot/commands/sync.py
 src/custom_copilot/registry/agents/skill-builder.agent.md
 src/custom_copilot/registry/instructions/sample.md
