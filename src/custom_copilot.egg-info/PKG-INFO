@@ -1,345 +1,288 @@
 Metadata-Version: 2.4
 Name: custom-copilot
-Version: 0.1.0
-Summary: Custom Copilot CLI - A tool for managing GitHub Copilot artifacts
+Version: 0.3.0
+Summary: Professional CLI tool for managing GitHub Copilot customizations
+Author-email: DJ2695 <35080988+DJ2695@users.noreply.github.com>
+License: MIT
+Project-URL: Homepage, https://github.com/DJ2695/custom-copilot
+Project-URL: Repository, https://github.com/DJ2695/custom-copilot
+Project-URL: Issues, https://github.com/DJ2695/custom-copilot/issues
+Keywords: github,copilot,cli,mcp,agents,prompts,skills,customizations
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Utilities
 Requires-Python: >=3.12
 Description-Content-Type: text/markdown
+License-File: LICENSE
+Provides-Extra: dev
+Requires-Dist: build>=1.0.0; extra == "dev"
+Dynamic: license-file
 
-# Custom Copilot CLI (`cc`)
+# Custom Copilot (`cuco`)
 
-A language-agnostic CLI tool for managing GitHub Copilot customizations in any project. The `cc` tool helps you initialize, add, and sync GitHub Copilot artifacts including agents, prompts, instructions, skills, and MCP servers.
+A professional CLI tool for managing GitHub Copilot customizations including agents, prompts, skills, instructions, and bundles.
 
-## 🚀 Quick Start
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
+
+## Features
+
+- 🚀 **Easy Setup** - Initialize GitHub Copilot customizations in any project
+- 📦 **Bundles** - Pre-configured combinations of customizations that work together
+- 🔧 **Custom Sources** - Add private repositories for company-internal customizations
+- 📝 **Templates** - Create new agents, prompts, skills, and bundles from templates
+- 🔄 **Sync** - Keep your customizations up-to-date
+- 🌐 **Extensible** - Support for public and private customization sources
+
+## Quick Start
 
 ### Installation
 
 ```bash
-# Install from source
+# Install from GitHub
+pip install git+https://github.com/DJ2695/custom-copilot.git
+
+# Or clone and install locally
+git clone https://github.com/DJ2695/custom-copilot.git
+cd custom-copilot
 pip install -e .
-
-# The 'cc' command will now be available globally
-cc help
 ```
 
-### Initialize a Project
+### Basic Usage
 
 ```bash
-# Create .github folder structure
-cd your-project
-cc init
+# Initialize a new project
+cuco init
+
+# Install a bundle
+cuco bundle add development-essentials
+
+# Add individual resources
+cuco add skill test-driven-development
+cuco add agent skill-builder
+
+# List available resources
+cuco list bundles
+cuco list skills
 ```
 
-This creates:
-```
-your-project/
-└── .github/
-    ├── agents/
-    ├── prompts/
-    ├── instructions/
-    ├── skills/
-    └── copilot-instructions.md
-```
+## Documentation
 
-### List Available Artifacts
+- [Installation Guide](INSTALL.md) - Detailed installation instructions
+- [Quick Reference](QUICK_REFERENCE.md) - Command reference and examples
+- [Migration Guide](MIGRATION.md) - Upgrading from older versions
+
+## Commands
+
+### Project Setup
 
 ```bash
-# List available artifacts in the registry
-cc list skills
-cc list prompts
-cc list agents
-cc list mcps
+cuco init                    # Initialize .github folder structure
 ```
 
-### Add Artifacts
+### Bundles
 
 ```bash
-# Add an agent
-cc add agent skill-builder
-
-# Add a prompt
-cc add prompt git
-
-# Add instructions
-cc add instructions sample
-
-# Add a skill
-cc add skill test-driven-development
-
-# Add an MCP server (automatically handles .env setup)
-cc add mcp context7
+cuco bundle list             # List available bundles
+cuco bundle add <name>       # Install a bundle
 ```
 
-### Sync Artifacts
-
-Keep your artifacts up to date with the registry:
+### Individual Resources
 
 ```bash
-# Sync all tracked artifacts
-cc sync
-
-# Sync a specific artifact
-cc sync test-driven-development
+cuco add agent <name>        # Add an agent
+cuco add prompt <name>       # Add a prompt
+cuco add skill <name>        # Add a skill
+cuco add instructions <name> # Add instructions
+cuco list <type>             # List available resources
 ```
 
-If you've made local modifications, `cc sync` will prompt you to:
-- Overwrite with the registry version
-- Keep your local changes
+### Custom Sources
 
-## 📖 Commands
-
-### `cc init`
-
-Initialize the `.github` folder structure in your project.
-
-**Usage:**
 ```bash
-cc init
+cuco source list                           # List custom sources
+cuco source add <name> <type> <url>        # Add a source
+cuco source remove <name>                  # Remove a source
 ```
 
-**What it does:**
-- Creates `.github/` directory (if not exists)
-- Creates subdirectories: `agents/`, `prompts/`, `instructions/`, `skills/`
-- Creates empty `copilot-instructions.md` file
+### Syncing
 
-### `cc add <type> <name>`
-
-Add an artifact from the package registry to your project.
-
-**Usage:**
 ```bash
-cc add agent <name>
-cc add prompt <name>
-cc add instructions <name>
-cc add skill <name>
-cc add mcp <name>
+cuco sync                    # Sync all resources
+cuco sync <name>             # Sync specific resource
 ```
 
-**Examples:**
-```bash
-cc add agent skill-builder
-cc add prompt git
-cc add skill test-driven-development
-cc add mcp context7
-```
-
-**What it does:**
-- Copies the artifact from the package registry to `.github/<type>/`
-- Tracks the artifact in `.github/.cc-tracking.json`
-- Prompts for confirmation if artifact already exists
-- **For MCPs**: 
-  - Adds MCP server configuration to `.vscode/mcp.json`
-  - Detects environment variables (e.g., `${env:API_KEY}`)
-  - Creates/updates `.env` file with required variables
-  - Prompts you to set the values
-
-### `cc list <type>`
-
-List available artifacts in the package registry.
-
-**Usage:**
-```bash
-cc list agents
-cc list prompts
-cc list instructions
-cc list skills
-cc list mcps
-```
-
-**Examples:**
-```bash
-cc list skills
-# Output:
-# Available skills:
-#   - skill-creator
-#   - systematic-debugging
-#   - test-driven-development
-#   ...
-
-cc list mcps
-# Output:
-# Available mcps:
-#   - context7
-#   - serena
-#   - sequential-thinking
-#   ...
-```
-
-**What it does:**
-- Shows all available artifacts of the specified type from the registry
-- Helps you discover what's available before adding
-
-### `cc sync [artifact-name]`
-
-Sync artifacts with the package registry.
-
-**Usage:**
-```bash
-# Sync all tracked artifacts
-cc sync
-
-# Sync specific artifact
-cc sync <artifact-name>
-```
-
-**Examples:**
-```bash
-cc sync                          # Sync everything
-cc sync test-driven-development  # Sync specific skill
-```
-
-**What it does:**
-- Checks if registry version differs from tracked version
-- Detects local modifications using file hashing
-- Prompts user if local modifications exist:
-  - Option 1: Overwrite with registry version
-  - Option 2: Keep local version
-- Updates tracking metadata after sync
-
-## 🏗️ Architecture
+## Structure
 
 ### Project Structure
 
 ```
-src/cc/
-├── __init__.py           # Package initialization
-├── __main__.py           # Entry point for python -m cc
-├── cli.py                # Main CLI router
-├── utils.py              # Utilities (hashing, tracking)
-├── commands/             # Command implementations
-│   ├── __init__.py
-│   ├── init.py          # cc init command
-│   ├── add.py           # cc add command
-│   └── sync.py          # cc sync command
-└── registry/             # Bundled artifacts
-    ├── agents/
-    ├── prompts/
-    ├── instructions/
-    └── skills/
+your-project/
+└── .github/
+    ├── agents/              # Custom agents
+    ├── prompts/             # Reusable prompts
+    ├── skills/              # Skills
+    ├── instructions/        # Instructions
+    └── copilot-instructions.md
 ```
 
-### Tracking System
+### Package Structure
 
-The tool tracks artifacts in `.github/.cc-tracking.json`:
+```
+custom_copilot/
+├── agents/                  # Public agents
+├── prompts/                 # Public prompts
+├── skills/                  # Public skills
+├── bundles/                 # Pre-configured bundles
+└── templates/               # Templates for creating resources
+```
+
+## Bundles
+
+Bundles are pre-configured combinations of customizations. The manifest uses these resource types:
+
+- **`custom-copilot`** - Resources from the public custom-copilot repository
+- **`bundle`** - Resources included within the bundle
+- **`custom`** - Resources from configured git sources (private repositories)
+- **`github`** - Resources from 3rd party GitHub repositories (future)
+
+### Example Bundle Manifest
 
 ```json
 {
-  "artifacts": {
-    "skills/test-driven-development": {
-      "type": "skills",
-      "name": "test-driven-development",
-      "source_hash": "abc123...",
-      "version": "latest",
-      "from_registry": true
-    }
+  "name": "my-bundle",
+  "version": "1.0.0",
+  "dependencies": {
+    "agents": [
+      {
+        "name": "skill-builder",
+        "type": "custom-copilot",
+        "source": "agents/skill-builder.agent.md"
+      },
+      {
+        "name": "company-agent",
+        "type": "custom",
+        "source_name": "my-company",
+        "source": "agents/company-agent.agent.md"
+      }
+    ],
+    "prompts": [
+      {
+        "name": "custom-prompt",
+        "type": "bundle",
+        "path": "prompts/custom.prompt.md"
+      }
+    ]
   }
 }
 ```
 
-This enables:
-- ✅ Detection of local modifications (by comparing hashes)
-- ✅ Identification of registry-based vs user-created artifacts
-- ✅ Version tracking (future enhancement)
-- ✅ Selective sync operations
+## Private Customizations
 
-### How It Works
-
-1. **Registry**: Artifacts are bundled with the package in `src/cc/registry/`
-2. **Tracking**: When you `cc add` an artifact, its hash is stored
-3. **Sync Detection**:
-   - Compare current file hash with tracked hash → detects local changes
-   - Compare tracked hash with registry hash → detects upstream updates
-4. **Conflict Resolution**: User prompted to choose between local and registry version
-
-## 🔧 For Contributors
-
-### Adding New Artifacts to Registry
-
-To add a new artifact to the registry:
-
-1. Place the artifact in `src/cc/registry/<type>/`
-2. For files: `<name>.md`, `<name>.agent.md`, `<name>.prompt.md`
-3. For skills: Create directory `<name>/` with `SKILL.md`
-
-Example:
-```bash
-# Add a new prompt
-cp my-custom-prompt.md src/cc/registry/prompts/
-
-# Add a new skill
-cp -r my-skill/ src/cc/registry/skills/
-```
-
-### Extending Commands
-
-To add a new command:
-
-1. Create `src/cc/commands/yourcommand.py`
-2. Implement `run(args: List[str]) -> int` function
-3. Import and route in `src/cc/cli.py`
-
-Example:
-```python
-# src/cc/commands/yourcommand.py
-def run(args: List[str]) -> int:
-    print("Your command logic here")
-    return 0
-```
-
-```python
-# src/cc/cli.py
-from cc.commands import yourcommand
-
-def main(args):
-    # ...
-    elif command == "yourcommand":
-        return yourcommand.run(args[1:])
-```
-
-### Code Guidelines
-
-- **Modular**: Each command is self-contained in its own module
-- **Minimal dependencies**: Only Python standard library
-- **Clear separation**: CLI routing, command logic, and utilities are separate
-- **Type hints**: Use type hints for better code maintainability
-- **Documentation**: Docstrings for all public functions
-
-### Testing Your Changes
+Add your company's private customizations repository:
 
 ```bash
-# Install in development mode
-pip install -e .
+# Add a private source with HTTPS (uses git credentials)
+cuco source add my-company https://github.com/mycompany/copilot-customs.git
 
-# Test commands
-cd /tmp/test-project
-cc init
-cc add skill test-driven-development
-cc sync
+# Or add with SSH (requires SSH key setup)
+cuco source add my-company git@github.com:mycompany/copilot-customs.git
+
+# List configured sources
+cuco source list
 ```
 
-## 🔮 Future Enhancements
+The private repository must have the same structure as the public repo:
 
-- [ ] Remote registry support (fetch from GitHub, npm, etc.)
-- [ ] Version pinning and rollback
-- [ ] Three-way merge support for conflicts
-- [ ] Diff visualization for local modifications
-- [ ] Template variables for artifact customization
-- [ ] Artifact dependencies and installation order
-- [ ] Search registry command (with filters and keywords)
-- [ ] Export/share custom artifacts
+```
+mycompany/copilot-customs/
+└── custom_copilot/
+    ├── agents/
+    ├── prompts/
+    ├── skills/
+    └── bundles/
+```
 
-## 📝 License
+### Configuration File
 
-This project is part of the DJ2695/custom-copilot repository.
+Configuration is stored in:
+- `~/.cuco/config.json` (global)
+- `.cuco-config.json` (project-specific, takes precedence)
 
-## 🤝 Contributing
+```json
+{
+  "sources": [
+    {
+      "name": "my-company",
+      "type": "git",
+      "url": "https://github.com/mycompany/copilot-customs.git"
+    }
+  ]
+}
+```
 
-Contributions are welcome! Feel free to:
-- Add new artifacts to the registry
-- Improve conflict resolution logic
-- Enhance CLI user experience
-- Add new commands
-- Improve documentation
+### Using Custom Resources in Bundles
+
+```json
+{
+  "dependencies": {
+    "agents": [
+      {
+        "name": "company-agent",
+        "type": "custom",
+        "source_name": "my-company",
+        "source": "agents/company-agent.agent.md"
+      }
+    ]
+  }
+}
+```
+
+### Authentication
+
+**HTTPS URLs:**
+- Uses git credential helper
+- May prompt for username and password/token
+- Set up a personal access token for private repos
+
+**SSH URLs:**
+- Requires SSH keys set up with ssh-agent
+- Run `ssh-add ~/.ssh/id_rsa` to add your key
+- No password prompts during clone/pull
+
+## Creating Custom Resources
+
+### Using Templates
+
+```bash
+# Copy agent template
+cp custom_copilot/templates/agent-template.agent.md custom_copilot/agents/my-agent.agent.md
+
+# Copy skill template
+cp -r custom_copilot/templates/skill-template custom_copilot/skills/my-skill
+
+# Copy bundle template
+cp -r custom_copilot/templates/bundle-template custom_copilot/bundles/my-bundle
+```
+
+## Contributing
+
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+
+## License
+
+MIT License - see [LICENSE](LICENSE) file for details.
+
+## Links
+
+- [GitHub Repository](https://github.com/DJ2695/custom-copilot)
+- [Issue Tracker](https://github.com/DJ2695/custom-copilot/issues)
 
 ---
 
-**Note**: This tool is language-agnostic and works with any project type. The `.github` customizations work with GitHub Copilot regardless of your project's programming language.
+Made with ❤️ for GitHub Copilot users

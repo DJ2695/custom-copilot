@@ -1,18 +1,18 @@
 """
-Command-line interface for the cc tool.
+Command-line interface for custom-copilot.
 
 This module provides the main CLI entry point and command routing.
 """
 
 import sys
 from typing import List, Optional
-from cc.commands import init, add, sync, list as list_cmd
+from custom_copilot.commands import init, add, sync, list as list_cmd, bundle, source
 
 
 def print_help():
     """Print CLI help message."""
     help_text = """
-Custom Copilot CLI (cuco) - Manage GitHub Copilot artifacts
+Custom Copilot CLI (cuco) - Manage GitHub Copilot Customizations
 
 Usage:
     cuco init                                  Initialize .github folder structure
@@ -21,6 +21,11 @@ Usage:
     cuco add instructions <name>               Add instructions from registry
     cuco add skill <name>                      Add a skill from registry
     cuco add mcp <name>                        Add an MCP server from registry
+    cuco bundle list                           List available bundles
+    cuco bundle add <name>                     Install a bundle
+    cuco source list                           List configured git sources
+    cuco source add <name> <url>               Add a git source repository
+    cuco source remove <name>                  Remove a git source
     cuco list <type>                           List available artifacts in registry
     cuco sync                                  Sync all artifacts from registry
     cuco sync <artifact-name>                  Sync specific artifact from registry
@@ -30,11 +35,22 @@ Examples:
     cuco init
     cuco add agent skill-builder
     cuco add skill test-driven-development
-    cuco add mcp context7
-    cuco list skills
-    cuco list mcps
-    cuco sync
-    cuco sync skill-builder
+    cuco bundle add development-essentials
+    
+    # Add a private git repository with HTTPS
+    cuco source add my-company https://github.com/mycompany/copilot-customs.git
+    
+    # Add a private git repository with SSH
+    cuco source add my-company git@github.com:mycompany/copilot-customs.git
+    
+    cuco source list
+    cuco list bundles
+
+Resource Types in bundle.json:
+    "bundle"         - Resources within the bundle itself
+    "custom-copilot" - Resources from the public custom-copilot repository
+    "custom"         - Resources from a configured git source (requires source_name)
+    "github"         - Resources from 3rd party GitHub repos (future support)
 
 For more information, visit: https://github.com/DJ2695/custom-copilot
 """
@@ -69,6 +85,10 @@ def main(args: Optional[List[str]] = None) -> int:
             return sync.run(args[1:])
         elif command == "list":
             return list_cmd.run(args[1:])
+        elif command == "bundle":
+            return bundle.run(args[1:])
+        elif command == "source":
+            return source.run(args[1:])
         else:
             print(f"Error: Unknown command '{command}'")
             print("Run 'cuco help' for usage information.")

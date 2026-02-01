@@ -8,7 +8,7 @@ to artifacts from the registry and handles conflicts with local modifications.
 import shutil
 from pathlib import Path
 from typing import List, Optional
-from cc.utils import (
+from custom_copilot.utils import (
     get_github_dir,
     get_registry_path,
     get_all_tracked_artifacts,

@@ -8,7 +8,8 @@ in the package registry.
 import json
 from pathlib import Path
 from typing import List
-from cc.utils import get_registry_path
+from custom_copilot.utils import get_registry_path
+from custom_copilot.commands.bundle import list_available_bundles, load_bundle_manifest
 
 
 def list_mcp_servers() -> List[str]:
@@ -76,16 +77,36 @@ def run(args: List[str]) -> int:
     if len(args) < 1:
         print("Error: Missing artifact type")
         print("Usage: cuco list <type>")
-        print("Types: agents, prompts, instructions, skills, mcps")
+        print("Types: agents, prompts, instructions, skills, mcps, bundles")
         return 1
     
     artifact_type = args[0]
+    
+    # Handle bundles
+    if artifact_type == "bundles":
+        bundles = list_available_bundles()
+        if not bundles:
+            print("No bundles available")
+            return 0
+        
+        print("Available bundles:")
+        for bundle_name in bundles:
+            manifest = load_bundle_manifest(bundle_name)
+            if manifest:
+                version = manifest.get("version", "unknown")
+                description = manifest.get("description", "No description")
+                print(f"  - {bundle_name} (v{version})")
+                print(f"    {description}")
+        
+        print(f"\nTotal: {len(bundles)} bundles")
+        print(f"\nInstall with: cuco bundle add <name>")
+        return 0
     
     # Validate artifact type
     valid_types = ["agents", "prompts", "instructions", "skills", "mcps"]
     if artifact_type not in valid_types:
         print(f"Error: Unknown artifact type '{artifact_type}'")
-        print(f"Valid types: {', '.join(valid_types)}")
+        print(f"Valid types: {', '.join(valid_types + ['bundles'])}")
         return 1
     
     # Get artifacts

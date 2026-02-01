@@ -1,7 +1,7 @@
 [project]
-name = "copilot"
-version = "0.1.0"
-description = "Custom Copilot CLI - A tool for managing GitHub Copilot artifacts"
+name = "custom-copilot"
+version = "0.3.0"
+description = "Professional CLI tool for managing GitHub Copilot customizations"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = []
@@ -9,7 +9,7 @@ authors = [
     {name = "DJ2695", email = "35080988+DJ2695@users.noreply.github.com"}
 ]
 license = {text = "MIT"}
-keywords = ["github", "copilot", "cli", "mcp", "agents", "prompts"]
+keywords = ["github", "copilot", "cli", "mcp", "agents", "prompts", "skills", "customizations"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -32,15 +32,15 @@ Repository = "https://github.com/DJ2695/custom-copilot"
 Issues = "https://github.com/DJ2695/custom-copilot/issues"
 
 [project.scripts]
-cuco = "cc.cli:main"
+cuco = "custom_copilot.cli:main"
 
 [build-system]
 requires = ["setuptools>=68.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["cc", "cc.commands"]
+packages = ["custom_copilot", "custom_copilot.commands"]
 package-dir = {"" = "src"}
 
 [tool.setuptools.package-data]
-cc = ["registry/**/*"]
+custom_copilot = ["registry/**/*"]

@@ -1,0 +1,57 @@
+{
+  "name": "bundle-name",
+  "version": "1.0.0",
+  "description": "Brief description of what this bundle provides",
+  "copilotInstructions": {
+    "type": "bundle",
+    "path": "copilot-instructions.md",
+    "description": "Instructions on how to use this bundle"
+  },
+  "dependencies": {
+    "agents": [
+      {
+        "name": "agent-name",
+        "type": "custom-copilot",
+        "source": "agents/agent-name.agent.md",
+        "description": "Description of why this agent is included"
+      },
+      {
+        "name": "custom-agent",
+        "type": "custom",
+        "source_name": "my-company",
+        "source": "agents/custom-agent.agent.md",
+        "description": "Agent from a custom git source"
+      }
+    ],
+    "prompts": [
+      {
+        "name": "prompt-name",
+        "type": "custom-copilot",
+        "source": "prompts/prompt-name.prompt.md",
+        "description": "Description of why this prompt is included"
+      },
+      {
+        "name": "bundle-specific-prompt",
+        "type": "bundle",
+        "path": "prompts/bundle-specific.prompt.md",
+        "description": "Bundle-specific resource included in this bundle"
+      }
+    ],
+    "skills": [
+      {
+        "name": "skill-name",
+        "type": "custom-copilot",
+        "source": "skills/skill-name",
+        "description": "Description of why this skill is included"
+      }
+    ],
+    "instructions": []
+  },
+  "metadata": {
+    "author": "Your Name",
+    "created": "2026-02-01",
+    "tags": ["tag1", "tag2"],
+    "compatibleCopilotVersions": ["*"],
+    "recommendedFor": ["use-case-1", "use-case-2"]
+  }
+}

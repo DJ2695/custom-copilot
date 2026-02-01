@@ -10,7 +10,7 @@ import re
 import shutil
 from pathlib import Path
 from typing import List, Dict, Set, Optional
-from cc.utils import (
+from custom_copilot.utils import (
     get_github_dir,
     get_registry_path,
     track_artifact,
