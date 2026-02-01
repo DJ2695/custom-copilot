@@ -317,8 +317,7 @@ cc sync
 - [ ] Diff visualization for local modifications
 - [ ] Template variables for artifact customization
 - [ ] Artifact dependencies and installation order
-- [ ] List available artifacts command
-- [ ] Search registry command
+- [ ] Search registry command (with filters and keywords)
 - [ ] Export/share custom artifacts
 
 ## 📝 License

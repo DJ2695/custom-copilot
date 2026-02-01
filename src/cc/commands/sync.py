@@ -126,7 +126,6 @@ def sync_artifact(artifact_type: str, artifact_name: str, force: bool = False) -
         print("Options:")
         print("  1. Overwrite with registry version (local changes will be lost)")
         print("  2. Keep local version (skip sync)")
-        print("  3. Show differences (not implemented yet)")
         
         while True:
             choice = input("Choose [1/2]: ").strip()

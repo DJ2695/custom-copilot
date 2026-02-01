@@ -160,7 +160,7 @@ def update_env_file(env_vars: Set[str]) -> None:
         for var in sorted(new_vars):
             f.write(f'{var}=\n')
     
-    if env_file.exists() and mode == 'w':
+    if mode == 'w':
         print(f"✓ Created {env_file.name}")
     else:
         print(f"✓ Updated {env_file.name}")
