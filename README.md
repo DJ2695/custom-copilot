@@ -37,9 +37,15 @@ cuco init
 # Install a bundle
 cuco bundle add development-essentials
 
+# Install agentskills.io compatible skills
+cuco bundle add agentskills-example
+
 # Add individual resources
 cuco add skill test-driven-development
 cuco add agent skill-builder
+
+# Add skills from GitHub URLs
+cuco add skill https://github.com/anthropics/skills/tree/main/skills/brand-guidelines
 
 # List available resources
 cuco list bundles
@@ -51,6 +57,7 @@ cuco list skills
 - [Installation Guide](INSTALL.md) - Detailed installation instructions
 - [Quick Reference](QUICK_REFERENCE.md) - Command reference and examples
 - [Migration Guide](MIGRATION.md) - Upgrading from older versions
+- [AgentSkills Integration](AGENTSKILLS.md) - Using skills from agentskills.io repositories
 
 ## Commands
 
