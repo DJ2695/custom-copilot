@@ -111,25 +111,21 @@ your-project/
     └── copilot-instructions.md  (bundle-specific guidance)
 ```
 
-## Resource Versioning
+## Resource Organization
 
-Resources are versioned in `copilot-customizations/`:
+Resources are organized in `custom_copilot/` with a flat structure:
 
 ```
-copilot-customizations/
-├── agents/
-│   ├── latest/    # Current stable version
-│   └── v1/        # Version 1
-├── prompts/
-│   ├── latest/
-│   └── v1/
-└── skills/
-    └── latest/
+custom_copilot/
+├── agents/         # Flat, no version folders
+├── prompts/        # Flat, no version folders
+├── skills/         # Flat, no version folders
+├── bundles/        # Can be versioned if needed
+└── templates/      # Templates for new resources
 ```
 
-**Bundles can reference specific versions:**
-- `latest/` - Current stable (recommended)
-- `v1/`, `v2/` - Specific versions for compatibility
+**Base resources** are stored directly without version folders.  
+**Bundles** can optionally be versioned when needed.
 
 ## Development Workflow
 
@@ -145,8 +141,8 @@ copilot-customizations/
 
 1. **Develop** in `.github/` folder
 2. **Test** thoroughly
-3. **Promote** to `copilot-customizations/latest/` when stable
-4. **Create version** (`v1/`, `v2/`) if needed for compatibility
+3. **Promote** to `custom_copilot/<type>/` when stable
+4. **Use templates** from `custom_copilot/templates/`
 5. **Bundle** related resources for distribution
 
 ## Common Workflows
@@ -176,11 +172,11 @@ cuco sync                     # Update all tracked resources
 ### Creating a Bundle (Contributors)
 
 ```bash
-# 1. Create bundle directory
-mkdir -p copilot-customizations/bundles/my-bundle
+# 1. Use template
+cp -r custom_copilot/templates/bundle-template custom_copilot/bundles/my-bundle
 
-# 2. Create manifest
-cat > copilot-customizations/bundles/my-bundle/bundle.json << 'EOF'
+# 2. Edit manifest
+cat > custom_copilot/bundles/my-bundle/bundle.json << 'EOF'
 {
   "name": "my-bundle",
   "version": "1.0.0",
@@ -190,16 +186,15 @@ cat > copilot-customizations/bundles/my-bundle/bundle.json << 'EOF'
       {
         "name": "my-skill",
         "type": "reference",
-        "source": "skills/latest/my-skill",
-        "version": "latest"
+        "source": "skills/my-skill"
       }
     ]
   }
 }
 EOF
 
-# 3. Add instructions
-cat > copilot-customizations/bundles/my-bundle/copilot-instructions.md << 'EOF'
+# 3. Edit instructions
+cat > custom_copilot/bundles/my-bundle/copilot-instructions.md << 'EOF'
 # My Bundle
 Instructions on how to use this bundle...
 EOF
@@ -209,7 +204,7 @@ EOF
 
 - **Full documentation:** [README.md](README.md)
 - **Migration guide:** [MIGRATION.md](MIGRATION.md)
-- **Structure details:** [copilot-customizations/README.md](copilot-customizations/README.md)
+- **Structure details:** [custom_copilot/README.md](custom_copilot/README.md)
 - **Command help:** `cuco help`
 
 ## Tips
@@ -218,13 +213,18 @@ EOF
 - Use bundles for quick setup with related resources
 - Use individual resources for precise control
 
-💡 **Versioning**
-- Stick with `latest/` unless you need specific compatibility
-- Create versions when making breaking changes
+💡 **Templates**
+- Use templates in `custom_copilot/templates/` for consistency
+- Templates include agent, prompt, skill, and bundle examples
+
+💡 **Flat Structure**
+- Base resources have no version folders
+- Bundles can be versioned if needed
+- Simpler and cleaner than nested versions
 
 💡 **Development**
 - Use `.github/` for experimentation
-- Promote to `copilot-customizations/` when stable
+- Promote to `custom_copilot/` when stable
 
 💡 **Syncing**
 - Run `cuco sync` periodically to get updates

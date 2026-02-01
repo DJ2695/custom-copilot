@@ -399,42 +399,42 @@ src/cc/
     ├── instructions/
     └── skills/
 
-copilot-customizations/   # Versioned customizations
-├── agents/
-│   ├── latest/          # Latest version
-│   └── v1/              # Version 1
-├── prompts/
-│   ├── latest/
-│   └── v1/
-├── skills/
-│   └── latest/
-├── instructions/
-│   └── latest/
-└── bundles/             # Pre-configured bundles
-    └── example-bundle/
-        ├── bundle.json
-        ├── copilot-instructions.md
-        ├── agents/      # Bundle-specific agents
-        ├── prompts/     # Bundle-specific prompts
-        └── skills/      # Bundle-specific skills
+custom_copilot/          # Customization resources
+├── agents/              # Flat, no version folders
+├── prompts/             # Flat, no version folders
+├── skills/              # Flat, no version folders
+├── instructions/        # Flat, no version folders
+├── bundles/             # Pre-configured bundles (can be versioned)
+│   └── example-bundle/
+│       ├── bundle.json
+│       ├── copilot-instructions.md
+│       └── prompts/     # Bundle-specific resources (inline)
+└── templates/           # Templates for new resources
+    ├── agent-template.agent.md
+    ├── prompt-template.prompt.md
+    ├── skill-template/
+    └── bundle-template/
 ```
 
-### Versioning Strategy
+### Resource Organization
 
-Resources in `copilot-customizations/` support versioning:
+Resources in `custom_copilot/` use a flat structure without version folders:
 
-- **`latest/`**: Current stable version (default)
-- **`v1/`, `v2/`, etc.**: Specific versions for compatibility
-- Bundles can reference specific versions
-- Supports gradual migration to new versions
+- Base resources (agents, prompts, skills, instructions) have no versioning
+- Resources are updated in place
+- Bundles can optionally be versioned if needed
+- Templates provide starting points for new resources
 
 **Example:**
 ```
-agents/
-├── latest/
-│   └── planner.agent.md    # Current version
-└── v1/
-    └── planner.agent.md    # Old version for legacy support
+custom_copilot/
+├── agents/
+│   └── skill-builder.agent.md    # Direct, no version folder
+├── prompts/
+│   └── git.prompt.md              # Direct, no version folder
+└── bundles/
+    └── my-bundle/
+        └── v1.0.0/                # Bundles can be versioned
 ```
 
 ### Bundle System
@@ -451,8 +451,7 @@ Bundles combine multiple resources with manifest-based dependency management:
       {
         "name": "skill-builder",
         "type": "reference",
-        "source": "agents/latest/skill-builder.agent.md",
-        "version": "latest"
+        "source": "agents/skill-builder.agent.md"
       }
     ],
     "prompts": [
@@ -467,7 +466,7 @@ Bundles combine multiple resources with manifest-based dependency management:
 ```
 
 **Resource Types:**
-- **reference**: Links to versioned resources in copilot-customizations
+- **reference**: Links to shared resources in custom_copilot
 - **inline**: Bundle-specific resources included in the bundle
 
 ### Tracking System
@@ -505,59 +504,57 @@ This enables:
 
 ## 🔧 For Contributors
 
-### Development Workflow with `.github` and `copilot-customizations`
+### Development Workflow with `.github` and `custom_copilot`
 
-The repository now supports a dual-folder structure:
+The repository uses a clean, flat structure:
 
 **`.github/` folder:**
 - For developing and testing new skills, agents, prompts
 - Active development and experimentation
-- Not versioned in copilot-customizations
 - Can be used for project-specific customizations
 
-**`copilot-customizations/` folder:**
-- Stable, versioned resources
-- Ready for distribution
-- Supports version history (v1, v2, latest)
-- Organized into bundles
+**`custom_copilot/` folder:**
+- Stable resources ready for distribution
+- Flat structure (no version folders)
+- Resources updated in place
+- Bundles can be versioned if needed
+- Templates for creating new resources
 
 **Workflow:**
 1. Develop new skill/agent/prompt in `.github/`
 2. Test and iterate until stable
-3. Promote to `copilot-customizations/latest/`
-4. Create versioned copy if needed (v1, v2)
+3. Promote to `custom_copilot/<type>/`
+4. Use templates to create new resources
 5. Optionally create bundle combining resources
 
-### Adding New Artifacts to Customizations
+### Adding New Artifacts
 
-To add a new versioned artifact:
+To add a new artifact:
 
-1. Place the artifact in `copilot-customizations/<type>/latest/`
-2. For files: `<name>.md`, `<name>.agent.md`, `<name>.prompt.md`
-3. For skills: Create directory `<name>/` with `SKILL.md`
-4. Create versioned copies in `v1/`, `v2/` as needed
+1. Use a template from `custom_copilot/templates/`
+2. Place the artifact in `custom_copilot/<type>/`
+3. For files: `<name>.md`, `<name>.agent.md`, `<name>.prompt.md`
+4. For skills: Create directory `<name>/` with `SKILL.md`
 
 Example:
 ```bash
-# Add a new prompt (latest version)
-cp my-custom-prompt.md copilot-customizations/prompts/latest/
+# Copy template and customize
+cp custom_copilot/templates/prompt-template.prompt.md custom_copilot/prompts/my-prompt.prompt.md
 
-# Create v1 for compatibility
-cp my-custom-prompt.md copilot-customizations/prompts/v1/
-
-# Add a new skill
-cp -r my-skill/ copilot-customizations/skills/latest/
+# Add a new skill from template
+cp -r custom_copilot/templates/skill-template custom_copilot/skills/my-skill
 ```
 
 ### Creating a Bundle
 
 To create a new bundle:
 
-1. Create bundle directory: `copilot-customizations/bundles/my-bundle/`
-2. Create `bundle.json` manifest
-3. Add `copilot-instructions.md` with bundle-specific guidance
-4. Add inline resources in subdirectories (optional)
-5. Reference existing versioned resources
+1. Copy template: `custom_copilot/templates/bundle-template/`
+2. Rename to: `custom_copilot/bundles/my-bundle/`
+3. Customize `bundle.json` manifest
+4. Add `copilot-instructions.md` with bundle-specific guidance
+5. Add inline resources in subdirectories (optional)
+6. Reference existing resources
 
 Example `bundle.json`:
 ```json
@@ -574,8 +571,7 @@ Example `bundle.json`:
       {
         "name": "my-agent",
         "type": "reference",
-        "source": "agents/latest/my-agent.agent.md",
-        "version": "latest"
+        "source": "agents/my-agent.agent.md"
       }
     ],
     "skills": [
@@ -589,12 +585,22 @@ Example `bundle.json`:
 }
 ```
 
+### Templates
+
+The `custom_copilot/templates/` folder contains templates for all resource types:
+- `agent-template.agent.md` - Agent template
+- `prompt-template.prompt.md` - Prompt template
+- `skill-template/` - Skill template directory
+- `bundle-template/` - Bundle template directory
+
+Use these as starting points to ensure consistency.
+
 ### Legacy Registry (Backward Compatibility)
 
 The `src/cc/registry/` folder remains for backward compatibility:
 - Still used by `cuco add` command
 - Will be deprecated in future versions
-- Migrate new resources to `copilot-customizations/`
+- New resources should go in `custom_copilot/`
 
 ### Extending Commands
 
@@ -646,7 +652,8 @@ cuco sync
 ## 🔮 Future Enhancements
 
 - [ ] Remote registry support (fetch from GitHub, npm, etc.)
-- [x] Version pinning and rollback (via versioned customizations)
+- [x] Flat structure for base resources (simplified from versioning)
+- [x] Templates for creating new resources
 - [ ] Three-way merge support for conflicts
 - [ ] Diff visualization for local modifications
 - [ ] Template variables for artifact customization
@@ -655,7 +662,7 @@ cuco sync
 - [ ] Export/share custom artifacts
 - [x] Bundle support for combining customizations
 - [ ] Bundle dependency resolution and validation
-- [ ] Automated migration from registry to copilot-customizations
+- [ ] Bundle versioning system (when needed)
 
 ## 📝 License
 
