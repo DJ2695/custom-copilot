@@ -32,7 +32,7 @@ Repository = "https://github.com/DJ2695/custom-copilot"
 Issues = "https://github.com/DJ2695/custom-copilot/issues"
 
 [project.scripts]
-cc = "cc.cli:main"
+cuco = "cc.cli:main"
 
 [build-system]
 requires = ["setuptools>=68.0"]
