@@ -1,7 +1,7 @@
 """
 List command - List available artifacts from the registry.
 
-This module implements the `cc list` command which shows available artifacts
+This module implements the `cuco list` command which shows available artifacts
 in the package registry.
 """
 
@@ -75,7 +75,7 @@ def run(args: List[str]) -> int:
     """
     if len(args) < 1:
         print("Error: Missing artifact type")
-        print("Usage: cc list <type>")
+        print("Usage: cuco list <type>")
         print("Types: agents, prompts, instructions, skills, mcps")
         return 1
     
@@ -100,6 +100,6 @@ def run(args: List[str]) -> int:
         print(f"  - {artifact}")
     
     print(f"\nTotal: {len(artifacts)} {artifact_type}")
-    print(f"\nAdd with: cc add {artifact_type[:-1] if artifact_type != 'mcps' else 'mcp'} <name>")
+    print(f"\nAdd with: cuco add {artifact_type[:-1] if artifact_type != 'mcps' else 'mcp'} <name>")
     
     return 0

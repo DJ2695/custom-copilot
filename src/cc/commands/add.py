@@ -1,7 +1,7 @@
 """
 Add command - Add artifacts from the registry.
 
-This module implements the `cc add` command which copies artifacts from
+This module implements the `cuco add` command which copies artifacts from
 the package registry to the project's .github directory.
 """
 
@@ -129,7 +129,7 @@ def run(args: List[str]) -> int:
     """
     if len(args) < 1:
         print("Error: Missing artifact type")
-        print("Usage: cc add <type> <name>")
+        print("Usage: cuco add <type> <name>")
         print("Types: agent, prompt, instructions, skill, mcp")
         return 1
     
@@ -141,7 +141,7 @@ def run(args: List[str]) -> int:
     
     if len(args) < 2:
         print("Error: Missing artifact name")
-        print("Usage: cc add <type> <name>")
+        print("Usage: cuco add <type> <name>")
         print("Types: agent, prompt, instructions, skill, mcp")
         return 1
     
@@ -165,7 +165,7 @@ def run(args: List[str]) -> int:
     # Check if .github directory exists
     if not get_github_dir().exists():
         print("Error: .github directory not found")
-        print("Run 'cc init' first to initialize the structure")
+        print("Run 'cuco init' first to initialize the structure")
         return 1
     
     # Copy the artifact

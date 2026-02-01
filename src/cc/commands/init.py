@@ -1,7 +1,7 @@
 """
 Init command - Initialize .github folder structure.
 
-This module implements the `cc init` command which creates the standard
+This module implements the `cuco init` command which creates the standard
 .github directory structure for GitHub Copilot customizations.
 """
 
@@ -53,9 +53,9 @@ def run(args: List[str]) -> int:
     
     print("\n✓ Initialization complete!")
     print("\nYou can now add artifacts using:")
-    print("  cc add agent <name>")
-    print("  cc add prompt <name>")
-    print("  cc add instructions <name>")
-    print("  cc add skill <name>")
+    print("  cuco add agent <name>")
+    print("  cuco add prompt <name>")
+    print("  cuco add instructions <name>")
+    print("  cuco add skill <name>")
     
     return 0
