@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📖 Documentation
+    url: https://github.com/DJ2695/custom-copilot/blob/main/README.md
+    about: Please read the documentation first
+  - name: ⚠️ Contribution Policy
+    url: https://github.com/DJ2695/custom-copilot/blob/main/CONTRIBUTING.md
+    about: This repository is not accepting external contributions

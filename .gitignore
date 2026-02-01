@@ -2,3 +2,9 @@
 **/.env
 .serena/
 **/.DS_Store
+**/.cc-tracking.json
+*.pyc
+__pycache__/
+*.egg-info/
+dist/
+build/
