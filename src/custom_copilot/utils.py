@@ -26,6 +26,30 @@ def get_project_root() -> Path:
     return Path.cwd()
 
 
+def get_target_dir() -> Path:
+    """
+    Get the target directory path for customizations.
+    
+    Checks for integration directories in order:
+    1. .github (GitHub Copilot)
+    2. .claude (Claude Code)
+    3. .cuco (tool-agnostic)
+    
+    Returns:
+        Path to the target directory (defaults to .github if none exist)
+    """
+    project_root = get_project_root()
+    
+    # Check for existing directories in priority order
+    for dir_name in [".github", ".claude", ".cuco"]:
+        target_dir = project_root / dir_name
+        if target_dir.exists():
+            return target_dir
+    
+    # Default to .github
+    return project_root / ".github"
+
+
 def get_github_dir() -> Path:
     """
     Get the .github directory path.

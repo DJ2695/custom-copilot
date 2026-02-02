@@ -18,8 +18,10 @@ src/custom_copilot/commands/bundle.py
 src/custom_copilot/commands/init.py
 src/custom_copilot/commands/list.py
 src/custom_copilot/commands/mcp.py
+src/custom_copilot/commands/publish.py
 src/custom_copilot/commands/source.py
 src/custom_copilot/commands/sync.py
+src/custom_copilot/commands/template.py
 src/custom_copilot/registry/agents/skill-builder.agent.md
 src/custom_copilot/registry/instructions/sample.md
 src/custom_copilot/registry/mcps/mcp.json

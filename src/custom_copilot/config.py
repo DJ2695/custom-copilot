@@ -263,6 +263,7 @@ def get_custom_source_path(source_name: str) -> Optional[Path]:
     Supports multiple folder structures:
     - custom_copilot/ (traditional cuco structure)
     - .github/ (GitHub Copilot standard)
+    - .claude/ (Claude Code standard)
     - .cuco/ (alternative cuco structure)
     - skills/ (agentskills.io standard)
     
@@ -285,6 +286,7 @@ def get_custom_source_path(source_name: str) -> Optional[Path]:
         repo_path / "custom_copilot",  # Traditional cuco structure
         repo_path / ".cuco",            # Alternative cuco structure
         repo_path / ".github",          # GitHub Copilot standard
+        repo_path / ".claude",          # Claude Code standard
         repo_path / "skills",           # agentskills.io standard (root skills folder)
     ]
     
@@ -293,7 +295,7 @@ def get_custom_source_path(source_name: str) -> Optional[Path]:
             return path
     
     print(f"Warning: Repository '{source_name}' does not have a recognized folder structure")
-    print(f"  Expected one of: custom_copilot/, .cuco/, .github/, skills/")
+    print(f"  Expected one of: custom_copilot/, .cuco/, .github/, .claude/, skills/")
     return None
 
 
