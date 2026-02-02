@@ -1,0 +1,27 @@
+{
+  "name": "agentskills-example",
+  "version": "1.0.0",
+  "description": "Example bundle demonstrating agentskills.io integration with skills from anthropics/skills repository",
+  "dependencies": {
+    "skills": [
+      {
+        "name": "doc-coauthoring",
+        "type": "agentskills",
+        "repo": "anthropics/skills",
+        "skill": "doc-coauthoring"
+      },
+      {
+        "name": "mcp-builder",
+        "type": "agentskills",
+        "repo": "anthropics/skills",
+        "skill": "mcp-builder"
+      },
+      {
+        "name": "skill-creator",
+        "type": "agentskills",
+        "repo": "anthropics/skills",
+        "skill": "skill-creator"
+      }
+    ]
+  }
+}

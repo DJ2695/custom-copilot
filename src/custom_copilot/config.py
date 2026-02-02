@@ -8,6 +8,8 @@ for private bundles and customizations.
 import json
 import os
 import subprocess
+import urllib.request
+import tempfile
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -256,13 +258,19 @@ def clone_or_update_repo(source: Dict) -> Optional[Path]:
 
 def get_custom_source_path(source_name: str) -> Optional[Path]:
     """
-    Get the path to the custom_copilot folder in a custom source repository.
+    Get the path to the resources folder in a custom source repository.
+    
+    Supports multiple folder structures:
+    - custom_copilot/ (traditional cuco structure)
+    - .github/ (GitHub Copilot standard)
+    - .cuco/ (alternative cuco structure)
+    - skills/ (agentskills.io standard)
     
     Args:
         source_name: Name of the source
         
     Returns:
-        Path to custom_copilot folder in the source, or None if not found
+        Path to resources folder in the source, or None if not found
     """
     source = get_source_by_name(source_name)
     if not source:
@@ -272,10 +280,148 @@ def get_custom_source_path(source_name: str) -> Optional[Path]:
     if not repo_path:
         return None
     
-    # Look for custom_copilot folder in the repository
-    custom_copilot_path = repo_path / "custom_copilot"
-    if not custom_copilot_path.exists():
-        print(f"Warning: Repository '{source_name}' does not have a custom_copilot folder")
-        return None
+    # Check for different folder structures in priority order
+    possible_paths = [
+        repo_path / "custom_copilot",  # Traditional cuco structure
+        repo_path / ".cuco",            # Alternative cuco structure
+        repo_path / ".github",          # GitHub Copilot standard
+        repo_path / "skills",           # agentskills.io standard (root skills folder)
+    ]
     
-    return custom_copilot_path
+    for path in possible_paths:
+        if path.exists():
+            return path
+    
+    print(f"Warning: Repository '{source_name}' does not have a recognized folder structure")
+    print(f"  Expected one of: custom_copilot/, .cuco/, .github/, skills/")
+    return None
+
+
+def parse_github_url(url: str) -> Optional[Dict[str, str]]:
+    """
+    Parse a GitHub URL to extract owner, repo, path, and ref.
+    
+    Supports formats:
+    - https://github.com/owner/repo/blob/branch/path/to/file
+    - https://github.com/owner/repo/tree/branch/path/to/folder
+    - https://github.com/owner/repo (defaults to main branch)
+    - https://raw.githubusercontent.com/owner/repo/branch/path/to/file
+    
+    Args:
+        url: GitHub URL
+        
+    Returns:
+        Dictionary with 'owner', 'repo', 'path', 'ref' or None if invalid
+    """
+    url = url.strip()
+    
+    # Handle raw.githubusercontent.com URLs
+    if url.startswith("https://raw.githubusercontent.com/"):
+        # Format: https://raw.githubusercontent.com/owner/repo/branch/path
+        url_path = url[len("https://raw.githubusercontent.com/"):]
+        parts = url_path.split("/")
+        if len(parts) >= 3:
+            return {
+                "owner": parts[0],
+                "repo": parts[1],
+                "ref": parts[2] if len(parts) > 3 else "main",
+                "path": "/".join(parts[3:]) if len(parts) > 3 else ""
+            }
+    
+    # Handle regular github.com URLs
+    if url.startswith("https://github.com/") or url.startswith("http://github.com/"):
+        # Remove protocol and domain
+        url_path = url.replace("https://github.com/", "").replace("http://github.com/", "")
+        parts = url_path.split("/")
+        
+        if len(parts) >= 2:
+            result = {
+                "owner": parts[0],
+                "repo": parts[1],
+                "ref": "main",
+                "path": ""
+            }
+            
+            # Check if there's a blob/tree indicator
+            if len(parts) >= 4 and parts[2] in ["blob", "tree"]:
+                result["ref"] = parts[3]
+                result["path"] = "/".join(parts[4:]) if len(parts) > 4 else ""
+            elif len(parts) > 2:
+                # Treat remaining as path with default branch
+                result["path"] = "/".join(parts[2:])
+            
+            return result
+    
+    return None
+
+
+def download_github_file(owner: str, repo: str, path: str, ref: str = "main") -> Optional[Path]:
+    """
+    Download a file from GitHub to a temporary location.
+    
+    Args:
+        owner: Repository owner
+        repo: Repository name
+        path: Path to file in repository
+        ref: Git reference (branch, tag, commit)
+        
+    Returns:
+        Path to downloaded file, or None if failed
+    """
+    # Construct raw URL
+    raw_url = f"https://raw.githubusercontent.com/{owner}/{repo}/{ref}/{path}"
+    
+    temp_path = None
+    try:
+        # Create a temp file with appropriate extension
+        suffix = Path(path).suffix or ".md"
+        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)
+        temp_path = Path(temp_file.name)
+        temp_file.close()
+        
+        # Download the file with timeout
+        import urllib.request
+        import socket
+        
+        # Set a 30 second timeout
+        socket.setdefaulttimeout(30)
+        urllib.request.urlretrieve(raw_url, temp_path)
+        
+        # Basic size validation (reject files > 10MB)
+        if temp_path.stat().st_size > 10 * 1024 * 1024:
+            temp_path.unlink()
+            print("Error: Downloaded file exceeds 10MB size limit")
+            return None
+        
+        return temp_path
+    except Exception as e:
+        print(f"Error downloading file from GitHub: {e}")
+        if temp_path and temp_path.exists():
+            temp_path.unlink()
+        return None
+
+
+def is_agentskills_repo(repo_path: Path) -> bool:
+    """
+    Check if a repository follows the agentskills.io standard.
+    
+    An agentskills repo has a skills/ folder at the root with SKILL.md files.
+    
+    Args:
+        repo_path: Path to repository
+        
+    Returns:
+        True if it appears to be an agentskills repository
+    """
+    skills_path = repo_path / "skills"
+    if not skills_path.exists() or not skills_path.is_dir():
+        return False
+    
+    # Check if there are any SKILL.md files
+    for item in skills_path.iterdir():
+        if item.is_dir():
+            skill_file = item / "SKILL.md"
+            if skill_file.exists():
+                return True
+    
+    return False

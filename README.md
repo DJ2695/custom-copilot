@@ -37,9 +37,15 @@ cuco init
 # Install a bundle
 cuco bundle add development-essentials
 
+# Install agentskills.io compatible skills
+cuco bundle add agentskills-example
+
 # Add individual resources
 cuco add skill test-driven-development
 cuco add agent skill-builder
+
+# Add skills from GitHub URLs
+cuco add skill https://github.com/anthropics/skills/tree/main/skills/brand-guidelines
 
 # List available resources
 cuco list bundles
@@ -51,6 +57,7 @@ cuco list skills
 - [Installation Guide](INSTALL.md) - Detailed installation instructions
 - [Quick Reference](QUICK_REFERENCE.md) - Command reference and examples
 - [Migration Guide](MIGRATION.md) - Upgrading from older versions
+- [AgentSkills Integration](AGENTSKILLS.md) - Using skills from agentskills.io repositories
 
 ## Commands
 
@@ -124,7 +131,8 @@ Bundles are pre-configured combinations of customizations. The manifest uses the
 - **`custom-copilot`** - Resources from the public custom-copilot repository
 - **`bundle`** - Resources included within the bundle
 - **`custom`** - Resources from configured git sources (private repositories)
-- **`github`** - Resources from 3rd party GitHub repositories (future)
+- **`github`** - Resources from GitHub URLs (direct file or folder links)
+- **`agentskills`** - Skills from agentskills.io compatible repositories (like anthropics/skills)
 
 ### Example Bundle Manifest
 
@@ -146,6 +154,19 @@ Bundles are pre-configured combinations of customizations. The manifest uses the
         "source": "agents/company-agent.agent.md"
       }
     ],
+    "skills": [
+      {
+        "name": "brand-guidelines",
+        "type": "agentskills",
+        "repo": "anthropics/skills",
+        "skill": "brand-guidelines"
+      },
+      {
+        "name": "custom-skill",
+        "type": "github",
+        "url": "https://github.com/owner/repo/blob/main/skills/my-skill"
+      }
+    ],
     "prompts": [
       {
         "name": "custom-prompt",
@@ -155,6 +176,38 @@ Bundles are pre-configured combinations of customizations. The manifest uses the
     ]
   }
 }
+```
+
+## Adding Skills from Various Sources
+
+### From Built-in Registry
+
+```bash
+cuco add skill test-driven-development
+```
+
+### From GitHub URLs
+
+Add skills directly from GitHub repositories:
+
+```bash
+# From anthropics/skills (agentskills.io standard)
+cuco add skill https://github.com/anthropics/skills/tree/main/skills/brand-guidelines
+
+# From any GitHub repository with a SKILL.md file
+cuco add skill https://github.com/owner/repo/blob/main/path/to/skill/SKILL.md
+
+# Direct file URL
+cuco add skill https://raw.githubusercontent.com/owner/repo/main/skills/my-skill/SKILL.md
+```
+
+### From Custom Sources
+
+Add your own git repositories as sources:
+
+```bash
+cuco source add my-skills https://github.com/myorg/skills.git
+cuco add skill my-custom-skill
 ```
 
 ## Private Customizations
@@ -172,8 +225,9 @@ cuco source add my-company git@github.com:mycompany/copilot-customs.git
 cuco source list
 ```
 
-The private repository must have the same structure as the public repo:
+The private repository can use any of these folder structures:
 
+### Traditional cuco Structure
 ```
 mycompany/copilot-customs/
 └── custom_copilot/
@@ -182,6 +236,39 @@ mycompany/copilot-customs/
     ├── skills/
     └── bundles/
 ```
+
+### Alternative .cuco Structure
+```
+mycompany/copilot-customs/
+└── .cuco/
+    ├── agents/
+    ├── prompts/
+    ├── skills/
+    └── bundles/
+```
+
+### GitHub Copilot Standard (.github)
+```
+mycompany/copilot-customs/
+└── .github/
+    ├── agents/
+    ├── prompts/
+    ├── skills/
+    └── bundles/
+```
+
+### AgentSkills.io Standard
+```
+mycompany/skills-repo/
+└── skills/
+    ├── skill-one/
+    │   └── SKILL.md
+    ├── skill-two/
+    │   └── SKILL.md
+    └── ...
+```
+
+The tool automatically detects which structure your repository uses.
 
 ### Configuration File
 

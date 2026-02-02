@@ -37,6 +37,10 @@ Examples:
     cuco add skill test-driven-development
     cuco bundle add development-essentials
     
+    # Add skills from GitHub URLs
+    cuco add skill https://github.com/anthropics/skills/tree/main/skills/brand-guidelines
+    cuco add skill https://github.com/owner/repo/blob/main/path/to/skill
+    
     # Add a private git repository with HTTPS
     cuco source add my-company https://github.com/mycompany/copilot-customs.git
     
@@ -50,7 +54,14 @@ Resource Types in bundle.json:
     "bundle"         - Resources within the bundle itself
     "custom-copilot" - Resources from the public custom-copilot repository
     "custom"         - Resources from a configured git source (requires source_name)
-    "github"         - Resources from 3rd party GitHub repos (future support)
+    "github"         - Direct GitHub URLs to files or folders
+    "agentskills"    - Skills from agentskills.io compatible repos (e.g., anthropics/skills)
+
+Supported Repository Structures for Custom Sources:
+    - custom_copilot/  (traditional cuco structure)
+    - .cuco/           (alternative cuco structure)
+    - .github/         (GitHub Copilot standard)
+    - skills/          (agentskills.io standard with SKILL.md files)
 
 For more information, visit: https://github.com/DJ2695/custom-copilot
 """
