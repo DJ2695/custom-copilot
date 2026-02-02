@@ -3,8 +3,14 @@
 ## Quick Start
 
 ```bash
-# Initialize project
+# Initialize project (GitHub Copilot)
 cuco init
+
+# Or initialize for Claude Code
+cuco init --engine=claude
+
+# Or initialize for tool-agnostic format
+cuco init --engine=cuco
 
 # List available bundles
 cuco bundle list
@@ -14,6 +20,41 @@ cuco bundle add development-essentials
 ```
 
 ## Commands Overview
+
+### Initialization
+
+```bash
+cuco init                    # .github/ (GitHub Copilot - default)
+cuco init --engine=claude    # .claude/ (Claude Code)
+cuco init --engine=cuco      # .cuco/ (Tool-agnostic)
+```
+
+### Templates (NEW!)
+
+```bash
+# List templates
+cuco template list
+
+# Create from template
+cuco template create agent my-agent
+cuco template create skill my-skill
+cuco template create prompt my-prompt
+cuco template create bundle my-bundle
+```
+
+### Publishing (NEW!)
+
+```bash
+# Publish to marketplace
+cuco publish ./my-skill --type=skill --source=marketplace
+
+# Publish to git repository
+cuco publish ./my-agent.agent.md --source=git-commit \
+  --destination=/path/to/repo/agents --message="Add agent"
+
+# Publish to local directory
+cuco publish ./my-skill --source=local --destination=/path/to/dest
+```
 
 ### Individual Resources
 
@@ -83,6 +124,7 @@ cuco bundle add example-bundle
 
 ### Project Structure After Init
 
+**GitHub Copilot (.github/)**
 ```
 your-project/
 └── .github/
@@ -91,6 +133,29 @@ your-project/
     ├── instructions/
     ├── skills/
     └── copilot-instructions.md
+```
+
+**Claude Code (.claude/)**
+```
+your-project/
+└── .claude/
+    ├── agents/
+    ├── prompts/
+    ├── skills/
+    └── instructions.md
+```
+
+**Tool-Agnostic (.cuco/)**
+```
+your-project/
+└── .cuco/
+    ├── agents/
+    ├── prompts/
+    ├── instructions/
+    ├── skills/
+    ├── bundles/
+    ├── mcps/
+    └── config.json
 ```
 
 ### After Installing development-essentials Bundle
@@ -151,9 +216,29 @@ custom_copilot/
 
 ```bash
 cd my-project
-cuco init
+cuco init                         # Or init --engine=claude
 cuco bundle add development-essentials
 # Start coding with TDD, debugging, and skill creation support
+```
+
+### Creating Custom Resources
+
+```bash
+cuco template create skill my-custom-workflow
+# Edit .github/skills/my-custom-workflow/SKILL.md
+cuco template create agent my-coding-assistant
+# Edit .github/agents/my-coding-assistant.agent.md
+```
+
+### Publishing Your Work
+
+```bash
+# Share with community
+cuco publish ./my-skill --source=marketplace
+
+# Publish to team repository
+cuco publish ./my-agent.agent.md --source=git-commit \
+  --destination=/path/to/team/repo/agents
 ```
 
 ### Adding Individual Resources
@@ -202,12 +287,29 @@ EOF
 
 ## Getting Help
 
+- **Fast Customization Guide:** [FAST_CUSTOMIZATION.md](FAST_CUSTOMIZATION.md) - NEW!
 - **Full documentation:** [README.md](README.md)
+- **AgentSkills Integration:** [AGENTSKILLS.md](AGENTSKILLS.md)
 - **Migration guide:** [MIGRATION.md](MIGRATION.md)
 - **Structure details:** [custom_copilot/README.md](custom_copilot/README.md)
 - **Command help:** `cuco help`
 
 ## Tips
+
+💡 **Integration Engines**
+- GitHub Copilot: `.github/` folder (default)
+- Claude Code: `.claude/` folder
+- Tool-agnostic: `.cuco/` folder
+
+💡 **Templates**
+- Quick creation of agents, skills, prompts, bundles
+- Use `cuco template create` for consistency
+- Templates automatically use your active integration folder
+
+💡 **Publishing**
+- Share resources with marketplace or team
+- Validation ensures quality before publishing
+- Multiple destination options (marketplace, git, local)
 
 💡 **Bundle vs Individual Resources**
 - Use bundles for quick setup with related resources

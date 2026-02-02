@@ -66,6 +66,7 @@ cuco list skills
 
 ## Documentation
 
+- [Fast Customization Guide](FAST_CUSTOMIZATION.md) - **NEW!** Complete guide for new features
 - [Installation Guide](INSTALL.md) - Detailed installation instructions
 - [Quick Reference](QUICK_REFERENCE.md) - Command reference and examples
 - [Migration Guide](MIGRATION.md) - Upgrading from older versions
