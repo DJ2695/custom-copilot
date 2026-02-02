@@ -59,8 +59,11 @@ def validate_resource(resource_path: Path, resource_type: str) -> bool:
         try:
             with open(bundle_json, 'r') as f:
                 json.load(f)
-        except Exception as e:
-            print(f"Error: Invalid bundle.json: {e}")
+        except json.JSONDecodeError as e:
+            print(f"Error: Invalid JSON in bundle.json: {e}")
+            return False
+        except IOError as e:
+            print(f"Error: Could not read bundle.json: {e}")
             return False
     
     print(f"✓ Resource validation passed")
@@ -256,11 +259,11 @@ def run(args: List[str]) -> int:
     elif source_type == "git-commit":
         if destination is None:
             print("Error: --destination required for git-commit")
-            print("  Specify the target repo path and subdirectory")
+            print("  Specify the target directory within a git repository")
+            print("  Example: /path/to/repo/agents (resource will be added to agents/)")
             return 1
         
-        # Extract repo path and subdir
-        # Assume destination is like /path/to/repo/agents
+        # Find the git repository root
         repo_path = destination
         while not (repo_path / ".git").exists() and repo_path != repo_path.parent:
             repo_path = repo_path.parent
@@ -269,7 +272,15 @@ def run(args: List[str]) -> int:
             print(f"Error: No git repository found at or above {destination}")
             return 1
         
-        target_subdir = str(destination.relative_to(repo_path).parent)
+        # Validate destination is within repo and get the relative path
+        try:
+            relative_dest = destination.relative_to(repo_path)
+            # The target subdirectory is where we'll place the resource
+            # publish_to_git_repo will append the resource name to this
+            target_subdir = str(relative_dest) if str(relative_dest) != "." else ""
+        except ValueError:
+            print(f"Error: Destination {destination} is not within git repository {repo_path}")
+            return 1
         
         if publish_to_git_repo(resource_path, repo_path, target_subdir, commit_message):
             return 0

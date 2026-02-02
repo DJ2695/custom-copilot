@@ -96,8 +96,9 @@ def create_from_template(resource_type: str, name: str, output_path: Path = None
                         content = content.replace("{{NAME}}", name)
                         content = content.replace("{{name}}", name)
                         file_path.write_text(content)
-                    except Exception:
-                        pass  # Skip binary files
+                    except (UnicodeDecodeError, PermissionError) as e:
+                        # Skip binary files or files we can't read/write
+                        print(f"  Note: Skipped {file_path.name}: {type(e).__name__}")
             
             print(f"✓ Created {resource_type} template at {output_path}")
         
