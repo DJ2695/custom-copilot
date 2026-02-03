@@ -1,18 +1,20 @@
 # Custom Copilot (`cuco`)
 
-A professional CLI tool for managing GitHub Copilot customizations including agents, prompts, skills, instructions, and bundles.
+Fast and quick customization of Agentic Coding Agents for your project.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 
 ## Features
 
-- 🚀 **Easy Setup** - Initialize GitHub Copilot customizations in any project
+- 🚀 **Multiple Integration Engines** - Support for GitHub Copilot, Claude Code, and tool-agnostic formats
 - 📦 **Bundles** - Pre-configured combinations of customizations that work together
 - 🔧 **Custom Sources** - Add private repositories for company-internal customizations
 - 📝 **Templates** - Create new agents, prompts, skills, and bundles from templates
-- 🔄 **Sync** - Keep your customizations up-to-date
-- 🌐 **Extensible** - Support for public and private customization sources
+- 📤 **Publishing** - Easy commands to publish resources to various destinations
+- 🔄 **Smart Sync** - Keep customizations up-to-date with conflict detection
+- 🌐 **Multi-Standard Support** - Works with AgentSkills.io, Anthropic Skills, MCP, and more
+- 🎯 **Extensible** - Support for public and private customization sources
 
 ## Quick Start
 
@@ -31,18 +33,28 @@ pip install -e .
 ### Basic Usage
 
 ```bash
-# Initialize a new project
+# Initialize a new project (GitHub Copilot by default)
 cuco init
+
+# Or initialize for Claude Code
+cuco init --engine=claude
+
+# Or initialize in tool-agnostic format
+cuco init --engine=cuco
 
 # Install a bundle
 cuco bundle add development-essentials
 
-# Install agentskills.io compatible skills
-cuco bundle add agentskills-example
+# Create resources from templates
+cuco template create agent my-custom-agent
+cuco template create skill my-workflow-skill
 
 # Add individual resources
 cuco add skill test-driven-development
 cuco add agent skill-builder
+
+# Publish your resources
+cuco publish ./my-skill --type=skill --source=marketplace
 
 # Add skills from GitHub URLs
 cuco add skill https://github.com/anthropics/skills/tree/main/skills/brand-guidelines
@@ -54,6 +66,7 @@ cuco list skills
 
 ## Documentation
 
+- [Fast Customization Guide](FAST_CUSTOMIZATION.md) - **NEW!** Complete guide for new features
 - [Installation Guide](INSTALL.md) - Detailed installation instructions
 - [Quick Reference](QUICK_REFERENCE.md) - Command reference and examples
 - [Migration Guide](MIGRATION.md) - Upgrading from older versions
@@ -64,7 +77,27 @@ cuco list skills
 ### Project Setup
 
 ```bash
-cuco init                    # Initialize .github folder structure
+cuco init                    # Initialize .github folder (GitHub Copilot)
+cuco init --engine=claude    # Initialize .claude folder (Claude Code)
+cuco init --engine=cuco      # Initialize .cuco folder (tool-agnostic)
+```
+
+### Templates
+
+```bash
+cuco template list                      # List available templates
+cuco template create agent <name>       # Create agent from template
+cuco template create skill <name>       # Create skill from template
+cuco template create prompt <name>      # Create prompt from template
+cuco template create bundle <name>      # Create bundle from template
+```
+
+### Publishing
+
+```bash
+cuco publish <path> --source=marketplace              # Get PR instructions
+cuco publish <path> --source=git-commit --destination=<repo-path>
+cuco publish <path> --source=local --destination=<path>
 ```
 
 ### Bundles
@@ -81,6 +114,7 @@ cuco add agent <name>        # Add an agent
 cuco add prompt <name>       # Add a prompt
 cuco add skill <name>        # Add a skill
 cuco add instructions <name> # Add instructions
+cuco add mcp <name>          # Add MCP server
 cuco list <type>             # List available resources
 ```
 
@@ -95,14 +129,15 @@ cuco source remove <name>                  # Remove a source
 ### Syncing
 
 ```bash
-cuco sync                    # Sync all resources
+cuco sync                    # Sync all resources (with conflict detection)
 cuco sync <name>             # Sync specific resource
 ```
 
 ## Structure
 
-### Project Structure
+### Project Structure (Multiple Formats Supported)
 
+**GitHub Copilot (.github/)**
 ```
 your-project/
 └── .github/
@@ -111,6 +146,28 @@ your-project/
     ├── skills/              # Skills
     ├── instructions/        # Instructions
     └── copilot-instructions.md
+```
+
+**Claude Code (.claude/)**
+```
+your-project/
+└── .claude/
+    ├── agents/              # Custom agents
+    ├── prompts/             # Reusable prompts
+    ├── skills/              # Skills
+    └── instructions.md
+```
+
+**Tool-Agnostic (.cuco/)**
+```
+your-project/
+└── .cuco/
+    ├── agents/              # Custom agents
+    ├── prompts/             # Reusable prompts
+    ├── skills/              # Skills
+    ├── bundles/             # Bundles
+    ├── mcps/                # MCP servers
+    └── config.json
 ```
 
 ### Package Structure
@@ -245,6 +302,15 @@ mycompany/copilot-customs/
     ├── prompts/
     ├── skills/
     └── bundles/
+```
+
+### Claude Code Standard (.claude)
+```
+mycompany/copilot-customs/
+└── .claude/
+    ├── agents/
+    ├── prompts/
+    └── skills/
 ```
 
 ### GitHub Copilot Standard (.github)

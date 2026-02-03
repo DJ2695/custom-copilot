@@ -6,21 +6,24 @@ This module provides the main CLI entry point and command routing.
 
 import sys
 from typing import List, Optional
-from custom_copilot.commands import init, add, sync, list as list_cmd, bundle, source
+from custom_copilot.commands import init, add, sync, list as list_cmd, bundle, source, template, publish
 
 
 def print_help():
     """Print CLI help message."""
     help_text = """
-Custom Copilot CLI (cuco) - Manage GitHub Copilot Customizations
+Custom Copilot CLI (cuco) - Fast Customization of Agentic Coding Agents
 
 Usage:
-    cuco init                                  Initialize .github folder structure
+    cuco init [--engine=<name>]                Initialize folder structure
     cuco add agent <name>                      Add an agent from registry
     cuco add prompt <name>                     Add a prompt from registry
     cuco add instructions <name>               Add instructions from registry
     cuco add skill <name>                      Add a skill from registry
     cuco add mcp <name>                        Add an MCP server from registry
+    cuco template create <type> <name>         Create resource from template
+    cuco template list                         List available templates
+    cuco publish <path> [options]              Publish resource to destination
     cuco bundle list                           List available bundles
     cuco bundle add <name>                     Install a bundle
     cuco source list                           List configured git sources
@@ -31,36 +34,54 @@ Usage:
     cuco sync <artifact-name>                  Sync specific artifact from registry
     cuco help                                  Show this help message
 
+Integration Engines (for init):
+    github     - GitHub Copilot (default) - creates .github/ folder
+    claude     - Claude Code - creates .claude/ folder
+    cuco       - Tool-agnostic format - creates .cuco/ folder
+
 Examples:
+    # Initialize project
     cuco init
+    cuco init --engine=claude
+    
+    # Add resources
     cuco add agent skill-builder
     cuco add skill test-driven-development
+    
+    # Create from templates
+    cuco template create agent my-agent
+    cuco template create skill my-skill
+    
+    # Publish resources
+    cuco publish ./my-skill --type=skill --source=marketplace
+    cuco publish ./my-agent.agent.md --source=git-commit --destination=/path/to/repo/agents
+    
+    # Use bundles
     cuco bundle add development-essentials
     
     # Add skills from GitHub URLs
     cuco add skill https://github.com/anthropics/skills/tree/main/skills/brand-guidelines
     cuco add skill https://github.com/owner/repo/blob/main/path/to/skill
     
-    # Add a private git repository with HTTPS
+    # Add a private git repository
     cuco source add my-company https://github.com/mycompany/copilot-customs.git
-    
-    # Add a private git repository with SSH
-    cuco source add my-company git@github.com:mycompany/copilot-customs.git
-    
     cuco source list
-    cuco list bundles
 
-Resource Types in bundle.json:
-    "bundle"         - Resources within the bundle itself
-    "custom-copilot" - Resources from the public custom-copilot repository
-    "custom"         - Resources from a configured git source (requires source_name)
-    "github"         - Direct GitHub URLs to files or folders
-    "agentskills"    - Skills from agentskills.io compatible repos (e.g., anthropics/skills)
+Resource Types:
+    agent, prompt, skill, instructions, bundle, mcp
+
+Supported Standards:
+    - AgentSkills.io (anthropics/skills and compatible repos)
+    - GitHub Copilot (.github/ folder structure)
+    - Claude Code (.claude/ folder structure)
+    - MCP (Model Context Protocol servers)
+    - Tool-agnostic (.cuco/ folder structure)
 
 Supported Repository Structures for Custom Sources:
     - custom_copilot/  (traditional cuco structure)
     - .cuco/           (alternative cuco structure)
     - .github/         (GitHub Copilot standard)
+    - .claude/         (Claude Code standard)
     - skills/          (agentskills.io standard with SKILL.md files)
 
 For more information, visit: https://github.com/DJ2695/custom-copilot
@@ -100,6 +121,10 @@ def main(args: Optional[List[str]] = None) -> int:
             return bundle.run(args[1:])
         elif command == "source":
             return source.run(args[1:])
+        elif command == "template":
+            return template.run(args[1:])
+        elif command == "publish":
+            return publish.run(args[1:])
         else:
             print(f"Error: Unknown command '{command}'")
             print("Run 'cuco help' for usage information.")

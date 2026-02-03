@@ -18,8 +18,10 @@ src/custom_copilot/commands/bundle.py
 src/custom_copilot/commands/init.py
 src/custom_copilot/commands/list.py
 src/custom_copilot/commands/mcp.py
+src/custom_copilot/commands/publish.py
 src/custom_copilot/commands/source.py
 src/custom_copilot/commands/sync.py
+src/custom_copilot/commands/template.py
 src/custom_copilot/registry/agents/skill-builder.agent.md
 src/custom_copilot/registry/instructions/sample.md
 src/custom_copilot/registry/mcps/mcp.json
@@ -36,3 +38,8 @@ src/custom_copilot/registry/skills/systematic-debugging/references/condition-bas
 src/custom_copilot/registry/skills/systematic-debugging/references/root-cause-tracing.md
 src/custom_copilot/registry/skills/test-driven-development/SKILL.md
 src/custom_copilot/registry/skills/test-driven-development/references/testing-anti-patterns.md
+tests/test_config.py
+tests/test_init.py
+tests/test_publish.py
+tests/test_template.py
+tests/test_utils.py
